@@ -357,11 +357,11 @@ vec3 lighting(
 	*/
 
 	vec3 light_direction = normalize(light.position - object_point);
-	vec3 reflected_light = reflect(-light_direction, object_normal);
-	float diffuse = max(dot(object_normal, light_direction), 0.);
-	float specular = pow(max(dot(reflected_light, direction_to_camera), 0.), mat.shininess);
-	vec3 color = mat.color * (mat.ambient + diffuse * mat.diffuse + specular * mat.specular);
-	return color;
+	float diffuse = 0.;
+	if (dot(object_normal, light_direction) > 0.) {
+		diffuse = dot(object_normal, light_direction);
+	}
+
 
 
 	/** #TODO RT2.2: 
@@ -371,13 +371,23 @@ vec3 lighting(
 	*/
 
 
+	float specular = 0.;
+
 	#if SHADING_MODE == SHADING_MODE_PHONG
+		vec3 reflected_light = reflect(-light_direction, object_normal);
+		if (dot(reflected_light, direction_to_camera) > 0.) {
+			specular = pow(dot(reflected_light, direction_to_camera), mat.shininess);
+		}
 	#endif
 
 	#if SHADING_MODE == SHADING_MODE_BLINN_PHONG
+		vec3 halfway = (light_direction + direction_to_camera) / normalize(light_direction + direction_to_camera);
+		if (dot(object_normal, halfway) > 0.) {
+			specular = pow(dot(object_normal, halfway), mat.shininess);
+		}
 	#endif
 
-	return mat.color;
+	return mat.color * (mat.ambient + diffuse * mat.diffuse) + specular * mat.specular;
 }
 
 /*
@@ -427,9 +437,11 @@ vec3 render_light(vec3 ray_origin, vec3 ray_direction) {
 		pix_color = m.color;
 
 		#if NUM_LIGHTS != 0
-		// for(int i_light = 0; i_light < NUM_LIGHTS; i_light++) {
-		// // do something for each light lights[i_light]
-		// }
+			for(int i_light = 0; i_light < NUM_LIGHTS; i_light++) {
+				// do something for each light lights[i_light]
+				pix_color += lighting(ray_origin + col_distance * ray_direction, col_normal, -ray_direction, lights[i_light], m);
+			
+			}
 		#endif
 	}
 
