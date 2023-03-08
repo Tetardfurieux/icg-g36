@@ -185,6 +185,20 @@ bool ray_plane_intersection(
 	vec3 plane_center = plane_normal * plane_offset;
 	t = MAX_RANGE + 10.;
 	//normal = ...;
+
+	////////////////////////
+	t = dot(plane_center - ray_origin, plane_normal) / dot(ray_direction, plane_normal);
+	if (t > 0.) {
+		normal = plane_normal;
+		if (dot(normal, ray_direction) > 0.) {
+			normal = -normal;
+		}
+		return true;
+	}
+	////////////////////////
+
+
+
 	return false;
 }
 
@@ -207,6 +221,60 @@ bool ray_cylinder_intersection(
 
 	vec3 intersection_point;
 	t = MAX_RANGE + 10.;
+
+	////////////////////////
+	vec3 center = cyl.center - cyl.height/2. * cyl.axis;
+	vec3 w = ray_origin - center;
+	vec3 v = ray_direction;
+	vec3 h = cyl.axis;
+	float r = cyl.radius;
+
+	float a = dot(v, v) - dot(v, h) * dot(v, h);
+	float b = 2. * (dot(v, w) - dot(v, h) * dot(w, h));
+	float c = dot(w, w) - dot(w, h) * dot(w, h) - r * r;
+
+	vec2 solutions;
+	int num_solutions = solve_quadratic(a, b, c, solutions);
+	
+
+	// Reset solutions if they do not fit in the cylinder
+	if (num_solutions >= 1 && solutions[0] > 0.) {
+		intersection_point = ray_origin + solutions[0] * ray_direction;
+		vec3 centered = intersection_point - center;
+		float d = dot(centered, h);
+		if (d < 0. || d > cyl.height) {
+			solutions[0] = MAX_RANGE + 10.;
+		}
+	}
+	if (num_solutions >= 2 && solutions[1] > 0.) {
+		intersection_point = ray_origin + solutions[1] * ray_direction;
+		vec3 centered = intersection_point - center;
+		float d = dot(centered, h);
+		if (d < 0. || d > cyl.height) {
+			solutions[1] = MAX_RANGE + 10.;
+		}
+	}
+
+	// Find the closest solution
+	if (num_solutions >= 1 && solutions[0] > 0. && solutions[0] < solutions[1]) {
+		t = solutions[0];
+	} else if (num_solutions >= 2 && solutions[1] > 0.) {
+		t = solutions[1];
+	}
+
+	// Compute the normal
+	if (t < MAX_RANGE) {
+		intersection_point = ray_origin + t * ray_direction;
+		vec3 centered = intersection_point - center;
+		float d = dot(centered, h);
+		normal = normalize(intersection_point - (center + d * h));
+		if (dot(normal, ray_direction) > 0.) {
+			normal = -normal;
+		}
+		return true;
+	}
+	////////////////////////
+
 
 	return false;
 }
