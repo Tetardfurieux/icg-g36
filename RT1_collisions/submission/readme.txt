@@ -18,4 +18,5 @@ The equation is explained in the pdf file joined to this archive.
 Problems encountered
 --------------------
 Debugging was pretty difficult especially for the second part since we did not find good ways to compute test values and 
-the crash reports in the browser's console were not very helpful.
+the crash reports in the browser's console were not very detailed.
+Computing the formula for the ray-cylinder intersection was also complex and we did not find many online resources to help us.
