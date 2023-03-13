@@ -358,16 +358,12 @@ vec3 lighting(
 
 	vec3 n = normalize(object_normal);
 	vec3 v = normalize(direction_to_camera);
-
 	vec3 l = normalize(light.position - object_point);
-	float light_intensity = 1.;
+
 	float diffuse = 0.;
 	if (dot(n, l) > 0.) {
-		diffuse = light_intensity * mat.diffuse * dot(n, l);
+		diffuse = dot(n, l);
 	}
-
-
-
 
 
 	/** #TODO RT2.2: 
@@ -380,16 +376,14 @@ vec3 lighting(
 	float specular = 0.;
 
 	#if SHADING_MODE == SHADING_MODE_PHONG
-		// l = normalize(object_point - light.position);
-		vec3 r = 2. * n * dot(n, l) - l;
+		vec3 r = normalize(2. * n * dot(n, l) - l);
 		if (dot(r, v) > 0.) {
 			specular = pow(dot(r, v), mat.shininess);
 		}
 	#endif
 
 	#if SHADING_MODE == SHADING_MODE_BLINN_PHONG
-		l = normalize(object_point - light.position);
-		vec3 h = (l + v) / length(l + v);
+		vec3 h = normalize((l + v) / length(l + v));
 		if (dot(n, h) > 0.) {
 			specular = pow(dot(n, h), mat.shininess);
 		}
