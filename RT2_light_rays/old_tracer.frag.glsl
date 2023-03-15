@@ -177,18 +177,6 @@ bool ray_plane_intersection(
 	vec3 plane_center = plane_normal * plane_offset;
 	t = MAX_RANGE + 10.;
 	//normal = ...;
-
-	////////////////////////
-	t = dot(plane_center - ray_origin, plane_normal) / dot(ray_direction, plane_normal);
-	if (t > 0.) {
-		normal = plane_normal;
-		if (dot(normal, ray_direction) > 0.) {
-			normal = -normal;
-		}
-		return true;
-	}
-	////////////////////////
-
 	return false;
 }
 
@@ -202,59 +190,6 @@ bool ray_cylinder_intersection(
 {
 	vec3 intersection_point;
 	t = MAX_RANGE + 10.;
-
-	////////////////////////
-	vec3 center = cyl.center - cyl.height/2. * cyl.axis;
-	vec3 w = ray_origin - center;
-	vec3 v = ray_direction;
-	vec3 h = cyl.axis;
-	float r = cyl.radius;
-
-	float a = dot(v, v) - dot(v, h) * dot(v, h);
-	float b = 2. * (dot(v, w) - dot(v, h) * dot(w, h));
-	float c = dot(w, w) - dot(w, h) * dot(w, h) - r * r;
-
-	vec2 solutions;
-	int num_solutions = solve_quadratic(a, b, c, solutions);
-	
-
-	// Reset solutions if they do not fit in the cylinder
-	if (num_solutions >= 1 && solutions[0] > 0.) {
-		intersection_point = ray_origin + solutions[0] * ray_direction;
-		vec3 centered = intersection_point - center;
-		float d = dot(centered, h);
-		if (d < 0. || d > cyl.height) {
-			solutions[0] = MAX_RANGE + 10.;
-		}
-	}
-	if (num_solutions >= 2 && solutions[1] > 0.) {
-		intersection_point = ray_origin + solutions[1] * ray_direction;
-		vec3 centered = intersection_point - center;
-		float d = dot(centered, h);
-		if (d < 0. || d > cyl.height) {
-			solutions[1] = MAX_RANGE + 10.;
-		}
-	}
-
-	// Find the closest solution
-	if (num_solutions >= 1 && solutions[0] > 0. && solutions[0] < solutions[1]) {
-		t = solutions[0];
-	} else if (num_solutions >= 2 && solutions[1] > 0.) {
-		t = solutions[1];
-	}
-
-	// Compute the normal
-	if (t < MAX_RANGE) {
-		intersection_point = ray_origin + t * ray_direction;
-		vec3 centered = intersection_point - center;
-		float d = dot(centered, h);
-		normal = normalize(intersection_point - (center + d * h));
-		if (dot(normal, ray_direction) > 0.) {
-			normal = -normal;
-		}
-		return true;
-	}
-	////////////////////////
 
 	return false;
 }
@@ -353,18 +288,8 @@ vec3 lighting(
 	- make sure that the reflected light shines towards the camera
 	- return the ouput color
 
-	You can use existing methods for `vec3` objects such as `mirror`, `reflect`, `norm`, `dot`, and `normalize`.
+	You can use existing methods for `vec3` objects such as `reflect`, `dot`, `normalize` and `length`.
 	*/
-
-	vec3 n = normalize(object_normal);
-	vec3 v = normalize(direction_to_camera);
-	vec3 l = normalize(light.position - object_point);
-
-	float diffuse = 0.;
-	if (dot(n, l) > 0.) {
-		diffuse = dot(n, l);
-	}
-
 
 	/** #TODO RT2.2: 
 	- shoot a shadow ray from the intersection point to the light
@@ -373,23 +298,13 @@ vec3 lighting(
 	*/
 
 
-	float specular = 0.;
-
 	#if SHADING_MODE == SHADING_MODE_PHONG
-		vec3 r = normalize(2. * n * dot(n, l) - l);
-		if (dot(r, v) > 0.) {
-			specular = pow(dot(r, v), mat.shininess);
-		}
 	#endif
 
 	#if SHADING_MODE == SHADING_MODE_BLINN_PHONG
-		vec3 h = normalize((l + v) / length(l + v));
-		if (dot(n, h) > 0.) {
-			specular = pow(dot(n, h), mat.shininess);
-		}
 	#endif
 
-	return mat.color * (mat.ambient + diffuse * mat.diffuse) + specular * mat.specular;
+	return mat.color;
 }
 
 /*
@@ -430,31 +345,19 @@ vec3 render_light(vec3 ray_origin, vec3 ray_direction) {
 	*/
 
 	vec3 pix_color = vec3(0.);
-	float reflection_weight = 1.;
 
-	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
-		float col_distance;
-		vec3 col_normal = vec3(0.);
-		int mat_id = 0;
-		if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)) {
-			Material m = get_material(mat_id);
-			// pix_color = m.color;
-
-			#if NUM_LIGHTS != 0
-				for(int i_light = 0; i_light < NUM_LIGHTS; i_light++) {
-					// do something for each light lights[i_light]
-					vec3 col_point = ray_origin + col_distance * ray_direction;
-					pix_color += lighting(col_point, col_normal, -ray_direction, lights[i_light], m);
-				}
-				
-			#endif
-		}
-
+	float col_distance;
+	vec3 col_normal = vec3(0.);
+	int mat_id = 0;
+	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)) {
 		Material m = get_material(mat_id);
-		ray_origin = ray_origin + col_distance * ray_direction;
-		ray_direction = reflect(ray_direction, col_normal);
-		reflection_weight *= 0.; // m.shininess;
+		pix_color = m.color;
 
+		#if NUM_LIGHTS != 0
+		// for(int i_light = 0; i_light < NUM_LIGHTS; i_light++) {
+		// // do something for each light lights[i_light]
+		// }
+		#endif
 	}
 
 	return pix_color;
