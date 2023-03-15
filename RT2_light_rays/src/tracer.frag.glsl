@@ -365,14 +365,6 @@ vec3 lighting(
 		diffuse = dot(n, l);
 	}
 
-
-	/** #TODO RT2.2: 
-	- shoot a shadow ray from the intersection point to the light
-	- check whether it intersects an object from the scene
-	- update the lighting accordingly
-	*/
-
-
 	float specular = 0.;
 
 	#if SHADING_MODE == SHADING_MODE_PHONG
@@ -389,8 +381,29 @@ vec3 lighting(
 		}
 	#endif
 
-	return mat.color * (mat.ambient + diffuse * mat.diffuse) + specular * mat.specular;
-}
+	/** #TODO RT2.2: 
+	- shoot a shadow ray from the intersection point to the light
+	- check whether it intersects an object from the scene
+	- update the lighting accordingly
+	*/
+
+	float shadow;
+	float shadow_distance;
+	vec3 shadow_normal;
+	int shadow_material_id;
+	float bias = 0.001; //We add a bias to the origin of the shadow ray to avoid self-intersection (shadow acne)
+	if (!ray_intersection(object_point + l * bias, l, shadow_distance, shadow_normal, shadow_material_id)) {
+		shadow = 1.;
+	}
+	else{
+		if(shadow_distance > length(light.position - object_point)){
+			shadow = 1.;
+		}
+		else
+		shadow = 0.;
+	}
+	
+	return mat.color * (mat.ambient + shadow * diffuse * mat.diffuse) + shadow * specular * mat.specular;}
 
 /*
 Render the light in the scene using ray-tracing!
