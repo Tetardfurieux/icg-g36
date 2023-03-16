@@ -360,24 +360,24 @@ vec3 lighting(
 	vec3 v = normalize(direction_to_camera);
 	vec3 l = normalize(light.position - object_point);
 
-	float diffuse = 0.;
+	float diffuseCoeff = 0.;
 	if (dot(n, l) > 0.) {
-		diffuse = dot(n, l);
+		diffuseCoeff = dot(n, l);
 	}
 
-	float specular = 0.;
+	float specularCoeff = 0.;
 
 	#if SHADING_MODE == SHADING_MODE_PHONG
 		vec3 r = normalize(2. * n * dot(n, l) - l);
 		if (dot(r, v) > 0.) {
-			specular = pow(dot(r, v), mat.shininess);
+			specularCoeff = pow(dot(r, v), mat.shininess);
 		}
 	#endif
 
 	#if SHADING_MODE == SHADING_MODE_BLINN_PHONG
-		vec3 h = normalize((l + v) / length(l + v));
+		vec3 h = normalize(l + v);
 		if (dot(n, h) > 0.) {
-			specular = pow(dot(n, h), mat.shininess);
+			specularCoeff = pow(dot(n, h), mat.shininess);
 		}
 	#endif
 
@@ -399,11 +399,17 @@ vec3 lighting(
 		if(shadow_distance > length(light.position - object_point)){
 			shadow = 1.;
 		}
-		else
-		shadow = 0.;
+		else {
+			shadow = 0.;
+		}
 	}
+
+	vec3 diffuse = mat.diffuse * diffuseCoeff * light.color * mat.color * shadow;
+	vec3 specular = mat.specular * specularCoeff * light.color * mat.color * shadow;
+
 	
-	return mat.color * (mat.ambient + shadow * diffuse * mat.diffuse) + shadow * specular * mat.specular;}
+	return mat.color * mat.ambient + diffuse + specular;
+}
 
 /*
 Render the light in the scene using ray-tracing!
