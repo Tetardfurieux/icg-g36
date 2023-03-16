@@ -446,28 +446,26 @@ vec3 render_light(vec3 ray_origin, vec3 ray_direction) {
 	float reflection_weight = 1.;
 
 	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
+		
 		float col_distance;
 		vec3 col_normal = vec3(0.);
 		int mat_id = 0;
+		
 		if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)) {
 			Material m = get_material(mat_id);
-			// pix_color = m.color;
-
 			#if NUM_LIGHTS != 0
 				for(int i_light = 0; i_light < NUM_LIGHTS; i_light++) {
-					// do something for each light lights[i_light]
 					vec3 col_point = ray_origin + col_distance * ray_direction;
-					pix_color += lighting(col_point, col_normal, -ray_direction, lights[i_light], m);
+					pix_color += reflection_weight*(1.0-m.mirror)*lighting(col_point, col_normal, -ray_direction, lights[i_light], m);
 				}
-				
 			#endif
+
+			ray_origin = ray_origin + col_distance * ray_direction + 0.001 * col_normal;
+			ray_direction = reflect(ray_direction, col_normal);
+			reflection_weight *= m.mirror;
+		}else{
+			break;
 		}
-
-		Material m = get_material(mat_id);
-		ray_origin = ray_origin + col_distance * ray_direction;
-		ray_direction = reflect(ray_direction, col_normal);
-		reflection_weight *= 0.; // m.shininess;
-
 	}
 
 	return pix_color;
