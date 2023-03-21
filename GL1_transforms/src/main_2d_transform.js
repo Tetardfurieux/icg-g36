@@ -79,7 +79,7 @@ async function main() {
 		void main() {
 			// #TODO GL1.1.1.1 Edit the vertex shader to apply mouse_offset translation to the vertex position.
 			// We have to return a vec4, because homogenous coordinates are being used.
-			gl_Position = vec4(position, 0, 1);
+			gl_Position = vec4(position + mouse_offset, 0, 1);
 		}`,
 			
 		/* 
@@ -119,10 +119,11 @@ async function main() {
 				
 		// Global variables specified in "uniforms" entry of the pipeline
 		uniform mat4 mat_transform;
+		//vec4 transformed_position = mat_transform * vec4(position, 0, 1);
 
 		void main() {
 			// #TODO GL1.1.2.1 Edit the vertex shader to apply mat_transform to the vertex position.
-			gl_Position = vec4(position, 0, 1);
+			gl_Position = mat_transform * vec4(position, 0, 1);
 		}`,
 		
 		frag: /*glsl*/`
@@ -192,8 +193,8 @@ async function main() {
 		// #TODO GL1.1.1.2 Draw the blue triangle translated by mouse_offset
 		
 		draw_triangle_with_offset({
-			mouse_offset: [0, 0],
-			color: [0.5, 0.5, 0.5],
+			mouse_offset: mouse_offset,
+			color: [0, 0, 1],
 		});
 
 		/*
@@ -205,15 +206,19 @@ async function main() {
 				* a red triangle spinning at [0.5, 0, 0]
 			You do not have to apply the mouse_offset to them.
 		*/
-		//draw_triangle_with_transform({
-		//	mat_transform: mat_transform,
-		//	color: [0.5, 0.5, 0.5],
-		//});
 
-		//draw_triangle_with_transform({
-		//	mat_transform: mat_transform,
-		//	color: [0.5, 0.5, 0.5],
-		//});
+		let trans = mat4.fromTranslation(mat4.create(), [0.5, 0, 0]);
+		let rot = mat4.fromZRotation(mat4.create(), sim_time * 30 * Math.PI / 180);
+		
+		draw_triangle_with_transform({
+			mat_transform: mat4.multiply(mat4.create(), rot, trans), // We apply the translation first, so the rotation is around origin
+			color: [0, 1, 0],
+		});
+
+		draw_triangle_with_transform({
+			mat_transform: mat4.multiply(mat4.create(), trans, rot), // Rotation first around origin, then translation
+			color: [1, 0, 0],
+		});
 
 		// You can write whatever you need in the debug box
 		debug_text.textContent = `

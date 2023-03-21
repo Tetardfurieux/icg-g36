@@ -191,7 +191,7 @@ export class SysRenderPlanetsUnshaded {
 
 				// #TODO GL1.2.1.2
 				// Calculate mat_mvp: model-view-projection matrix	
-				//mat4_matmul_many(mat_mvp, ...)
+				mat4_matmul_many(mat_mvp, mat_projection, mat_view, actor.mat_model_to_world)
 
 				entries_to_draw.push({
 					mat_mvp: mat_mvp,
