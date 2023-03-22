@@ -118,12 +118,14 @@ export class SysOrbitalMovement {
 		if(actor.orbit !== null) {
 			// Parent's translation
 			const parent = actors_by_name[actor.orbit]
+			const parent_translation_v = mat4.getTranslation([0, 0, 0], parent.mat_model_to_world)
 
 			// Orbit around the parent
 			const radius = actor.orbit_radius
 			const angle = sim_time * actor.orbit_speed + actor.orbit_phase
 			const x = radius * Math.cos(angle)
 			const y = radius * Math.sin(angle)
+
 			mat4.translate(M_orbit, parent.mat_model_to_world, [x, y, 0]);
 		} 
 
