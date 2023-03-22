@@ -111,18 +111,33 @@ export class SysOrbitalMovement {
 			mat4.fromScaling takes a 3D vector!
 		*/
 
-		//const M_orbit = mat4.create();
+		const M_orbit = mat4.create();
+		const M_rotate = mat4.create();
+		const M_scale = mat4.create();
 
 		if(actor.orbit !== null) {
 			// Parent's translation
 			const parent = actors_by_name[actor.orbit]
-			const parent_translation_v = mat4.getTranslation([0, 0, 0], parent.mat_model_to_world)
 
 			// Orbit around the parent
+			const radius = actor.orbit_radius
+			const angle = sim_time * actor.orbit_speed + actor.orbit_phase
+			const x = radius * Math.cos(angle)
+			const y = radius * Math.sin(angle)
+			mat4.translate(M_orbit, parent.mat_model_to_world, [x, y, 0]);
 		} 
+
+		// Spin around the planet's Z axis
+		const angle = sim_time * actor.rotation_speed
+		mat4.rotateZ(M_rotate, M_orbit, angle)
+
+		// Scale the unit sphere to match the desired size
+		const scale = actor.size
+		mat4.fromScaling(M_scale, [scale, scale, scale])
+
 		
 		// Store the combined transform in actor.mat_model_to_world
-		//mat4_matmul_many(actor.mat_model_to_world, ...);
+		mat4_matmul_many(actor.mat_model_to_world, M_orbit, M_rotate, M_scale)
 	}
 
 	simulate(scene_info) {
