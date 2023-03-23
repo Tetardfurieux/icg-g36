@@ -133,28 +133,24 @@ async function main() {
 		* cam_angle_y - camera ray's angle around the Y axis
 		*/
 
-		let r = cam_distance_base * cam_distance_factor
-		let eye = [
-			r * Math.sin(cam_angle_y) * Math.cos(cam_angle_z),
-			r * Math.sin(cam_angle_y) * Math.sin(cam_angle_z),
-			r * Math.cos(cam_angle_y),
-		]
-		let target = [0, 0, 0]
-		let up = [0, 0, 1]
+		const translation = mat4.translate(mat4.create(), mat4.create(), [cam_distance_base * cam_distance_factor, 0, 0])
+		const rotation_y = mat4.rotateY(mat4.create(), mat4.create(), cam_angle_y)
+		const rotation_z = mat4.rotateZ(mat4.create(), mat4.create(), cam_angle_z)
 
 
-		// Example camera matrix, looking along forward-X, edit this
-		const look_at = mat4.lookAt(mat4.create(), eye, target, up)
-
-		let mat_turntable = mat4.create()
-		mat_turntable = mat4.rotateY(mat_turntable, mat_turntable, cam_angle_z)
-		mat_turntable = mat4.rotateX(mat_turntable, mat_turntable, cam_angle_y)
-		// mat_turntable = mat4.translate(mat_turntable, mat_turntable, [0, 0, -r])
-
+		const look_at = mat4.lookAt(mat4.create(), 
+			[-5, 0, 0], // camera position in world coord
+			[0, 0, 0], // view target point
+			[0, 0, 1], // up vector
+		)
 
 		// Store the combined transform in mat_turntable
-		frame_info.mat_turntable = mat_turntable
-		mat4_matmul_many(frame_info.mat_turntable, look_at)
+		mat4_matmul_many(frame_info.mat_turntable, 
+			look_at, 
+			translation,
+			rotation_y,
+			rotation_z,
+		)
 	}
 
 	update_cam_transform(frame_info)
