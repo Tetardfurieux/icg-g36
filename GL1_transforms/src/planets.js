@@ -126,12 +126,14 @@ export class SysOrbitalMovement {
 			const x = radius * Math.cos(angle)
 			const y = radius * Math.sin(angle)
 
-			mat4.translate(M_orbit, parent.mat_model_to_world, [x, y, 0]);
+			mat4.fromTranslation(M_orbit, [x, y, 0])
+			mat4.translate(M_orbit, M_orbit, parent_translation_v)
+
 		} 
 
 		// Spin around the planet's Z axis
 		const angle = sim_time * actor.rotation_speed
-		mat4.rotateZ(M_rotate, M_orbit, angle)
+		mat4.rotateZ(M_rotate, M_rotate, angle)
 
 		// Scale the unit sphere to match the desired size
 		const scale = actor.size
