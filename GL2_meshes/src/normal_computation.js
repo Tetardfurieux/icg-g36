@@ -54,7 +54,7 @@ function compute_vertex_normals(mesh, tri_normals, angle_weights) {
 
 	const num_faces    = (mesh.faces.length / 3) | 0
 	const num_vertices = (mesh.vertex_positions.length / 3) | 0
-	const vertex_normals = Array(num_vertices).fill([0., 0., 0.])
+	const vertex_normals = Array.from({length: num_vertices}, () => [0., 0., 0.]) // fill with 0 vectors
 
 	for(let i_face = 0; i_face < num_faces; i_face++) {
 		const iv1 = mesh.faces[3*i_face + 0]
