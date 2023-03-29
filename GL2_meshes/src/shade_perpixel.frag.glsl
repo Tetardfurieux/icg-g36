@@ -9,6 +9,9 @@ precision mediump float;
 //varying ...
 //varying ...
 //varying ...
+varying vec3 normal;
+varying vec3 light_direction;
+varying vec3 view_direction;
 
 uniform vec3 material_color;
 uniform float material_shininess;
@@ -23,9 +26,9 @@ void main()
 
 	Implement the Blinn-Phong shading model by using the passed
 	variables and write the resulting color to `color`.
-
+	
 	Make sure to normalize values which may have been affected by interpolation!
 	*/
-	vec3 color = light_color;
+	vec3 color = material_color * (material_ambient + light_color * max(dot(normalize(normal), normalize(light_direction)), 0.0) + light_color * pow(max(dot(normalize(normal), normalize(light_direction + view_direction)), 0.0), material_shininess));
 	gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }
