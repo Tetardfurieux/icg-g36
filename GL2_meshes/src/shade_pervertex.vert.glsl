@@ -42,11 +42,10 @@ void main() {
 	vec3 V = normalize(-eye_space_position);
 	vec3 H = normalize(L + V);
 
-	vec3 diffuse = max(dot(N, L), 0.0) * light_color;
-	vec3 specular = pow(max(dot(N, H), 0.0), material_shininess) * light_color;
-	vec3 ambient = material_ambient * light_color;
+	float diffuse = dot(N, L);
+	float specular = pow(dot(N, H), material_shininess);
 
-	vec3 color = material_color * (ambient + diffuse + specular);
+	vec3 color = material_color * (material_ambient + diffuse + specular) * light_color;
 
 
 	gl_Position = mat_mvp * vec4(vertex_position, 1);
