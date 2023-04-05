@@ -28,7 +28,6 @@ function compute_triangle_normals_and_angle_weights(mesh) {
 		
 		// Modify the way triangle normals and angle_weights are computed
 
-		// normal = ((vert2 - vert1) x (vert3 - vert1)) / |(vert2 - vert1) x (vert3 - vert1)|
 		let edge_1 = vec3.subtract([0., 0., 0.], vert2, vert1)
 		let edge_2 = vec3.subtract([0., 0., 0.], vert3, vert1)
 		let edge_3 = vec3.subtract([0., 0., 0.], vert1, vert2)
@@ -36,7 +35,6 @@ function compute_triangle_normals_and_angle_weights(mesh) {
 		normal = vec3.normalize(normal, normal)
 		tri_normals.push(normal)
 
-		// angle_weights = [angle(vert2, vert3), angle(vert3, vert1), angle(vert1, vert2)]
 		angle_weights.push([vec3.angle(edge_2, edge_3), vec3.angle(edge_3, edge_1), vec3.angle(edge_1, edge_2)])
 
 
