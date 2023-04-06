@@ -54,8 +54,8 @@ void main() {
 	vec3 view_dir = normalize(-vpos_cam);
 	vec3 half_dir = normalize(light_dir + view_dir);
 
-	float diffuse = max(dot(normal, light_dir), 0.0);
-	float specular = pow(max(dot(normal, half_dir), 0.0), material_shininess);
+	float diffuse = max(dot(normalize(normal), light_dir), 0.0);
+	float specular = pow(max(dot(normalize(normal), half_dir), 0.0), material_shininess);
 	float ambient = 0.1;
 
 	float light_dist = length(light_position - vpos_cam);
