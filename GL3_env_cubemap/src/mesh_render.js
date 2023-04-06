@@ -262,8 +262,10 @@ export class SysRenderMeshesWithLight extends SysRenderMeshes {
 			blend: {
 				enable: true,
             	func: { //Not sure if this is correct
-                	src: 1, // GL_ONE
-                	dst: 1
+                	src: 'one',
+					dst: 'one',
+					// src: 'src alpha',
+					// dst: 'one minus src alpha',
             	},
 
 			},

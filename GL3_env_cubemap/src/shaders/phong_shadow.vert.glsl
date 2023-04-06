@@ -6,8 +6,8 @@ attribute vec2 vertex_tex_coords;
 
 // Per-vertex outputs passed on to the fragment shader
 
-varying vec3 v2f_normal;
-varying vec3 v2f_dir_to_camera;
+varying vec3 normal;
+varying vec3 vpos_cam;
 varying vec2 v2f_uv;
 
 // Global variables specified in "uniforms" entry of the pipeline
@@ -27,17 +27,16 @@ void main() {
     Hint: Compute the vertex position, normal and light_position in eye space.
     Hint: Write the final vertex position to gl_Position
     */
-	// viewing vector (from camera to vertex in view coordinates), camera is at vec3(0, 0, 0) in cam coords
-	// vertex position in camera coordinates
-	// transform normal to camera coordinates
-	vec3 vertex_position_view = (mat_model_view * vec4(vertex_position, 1)).xyz;
-	v2f_dir_to_camera = vertex_position_view;
 	
-	v2f_normal = mat_normals_to_view * vertex_normal;
+	
 
-	v2f_normal = normalize(v2f_normal);
-	v2f_dir_to_camera = normalize(v2f_dir_to_camera);
-	
+	vec3 eye_space_position = vec3(mat_model_view * vec4(vertex_position, 1));
+	vec3 eye_space_normal = mat_normals_to_view * vertex_normal;
+
+	normal = eye_space_normal;
+	vpos_cam = eye_space_position;
+
 	gl_Position = mat_mvp * vec4(vertex_position, 1);
+
 
 }
