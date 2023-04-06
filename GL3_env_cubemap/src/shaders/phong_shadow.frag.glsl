@@ -49,7 +49,6 @@ void main() {
 	Make sure to normalize values which may have been affected by interpolation!
 	*/
 
-	
 
 	vec3 light_dir = normalize(light_position - vpos_cam);
 	vec3 view_dir = normalize(-vpos_cam);
@@ -64,9 +63,11 @@ void main() {
 	vec3 color = attenuation * (diffuse * material_color * light_color + specular * light_color);
 
 	float shadowmap_dist = textureCube(cube_shadowmap, light_dir).r;
-	if (light_dist > 1.01 * shadowmap_dist) {
+	if (light_dist < 1.01 * shadowmap_dist) {
 		color = vec3(0.0, 0.0, 0.0);
 	}
+
+	
 
 	gl_FragColor = vec4(color, 1.0);
 }
