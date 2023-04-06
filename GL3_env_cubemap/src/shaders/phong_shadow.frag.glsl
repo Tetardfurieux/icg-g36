@@ -56,11 +56,12 @@ void main() {
 
 	float diffuse = max(dot(normal, light_dir), 0.0);
 	float specular = pow(max(dot(normal, half_dir), 0.0), material_shininess);
+	float ambient = 0.1;
 
 	float light_dist = length(light_position - vpos_cam);
 
 	float attenuation = 1.0 / (light_dist * light_dist);
-	vec3 color = attenuation * (diffuse * material_color * light_color + specular * material_color * light_color);
+	vec3 color = attenuation * (ambient * material_color + diffuse * material_color * light_color + specular * material_color * light_color);
 
 	float shadowmap_dist = textureCube(cube_shadowmap, -light_dir).r;
 	if (light_dist > 1.01 * shadowmap_dist) {
