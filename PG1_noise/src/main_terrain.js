@@ -121,8 +121,8 @@ async function main() {
 		// Store the combined transform in mat_turntable
 		// mat_turntable = A * B * ...
 		//mat4_matmul_many(mat_turntable, look_at) // edit this
-		mat4_matmul_many(mat_turntable, 
-			look_at, 
+		mat4_matmul_many(mat_turntable,
+			look_at,
 			translation,
 			rotation_y,
 			rotation_z,
@@ -198,7 +198,7 @@ async function main() {
 		cam_angle_y = -0.42
 		cam_distance_factor = 1.0
 		cam_target = [0, 0, 0]
-		
+
 		update_cam_transform()
 		update_needed = true
 	}

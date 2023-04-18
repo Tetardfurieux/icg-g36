@@ -27,8 +27,17 @@ function compute_triangle_normals_and_angle_weights(mesh) {
 		const vert3 = get_vert(mesh, mesh.faces[3*i_face + 2])
 		
 		// Modify the way triangle normals and angle_weights are computed
-		tri_normals.push([1., 0., 0.])
-		angle_weights.push([1., 1., 1.])
+
+		let edge_1 = vec3.subtract([0., 0., 0.], vert2, vert1)
+		let edge_2 = vec3.subtract([0., 0., 0.], vert3, vert1)
+		let edge_3 = vec3.subtract([0., 0., 0.], vert1, vert2)
+		let normal = (vec3.cross([0., 0., 0.], edge_1, edge_2))
+		normal = vec3.normalize(normal, normal)
+		tri_normals.push(normal)
+
+		angle_weights.push([vec3.angle(edge_2, edge_3), vec3.angle(edge_3, edge_1), vec3.angle(edge_1, edge_2)])
+
+
 	}
 	return [tri_normals, angle_weights]
 }
@@ -43,7 +52,7 @@ function compute_vertex_normals(mesh, tri_normals, angle_weights) {
 
 	const num_faces    = (mesh.faces.length / 3) | 0
 	const num_vertices = (mesh.vertex_positions.length / 3) | 0
-	const vertex_normals = Array(num_vertices).fill([0., 0., 0.])
+	const vertex_normals = Array.from({length: num_vertices}, () => [0., 0., 0.]) // fill with 0 vectors
 
 	for(let i_face = 0; i_face < num_faces; i_face++) {
 		const iv1 = mesh.faces[3*i_face + 0]
@@ -54,12 +63,18 @@ function compute_vertex_normals(mesh, tri_normals, angle_weights) {
 
 		// Add your code for adding the contribution of the current triangle to its vertices' normals
 
+		vertex_normals[iv1] = vec3.add([0., 0., 0.], vertex_normals[iv1], vec3.scale([0., 0., 0.], normal, angle_weights[i_face][0]))
+		vertex_normals[iv2] = vec3.add([0., 0., 0.], vertex_normals[iv2], vec3.scale([0., 0., 0.], normal, angle_weights[i_face][1]))
+		vertex_normals[iv3] = vec3.add([0., 0., 0.], vertex_normals[iv3], vec3.scale([0., 0., 0.], normal, angle_weights[i_face][2]))
+
+
+
 	}
 
 	for(let i_vertex = 0; i_vertex < num_vertices; i_vertex++) {
 		// Normalize the vertices
 
-		vertex_normals[i_vertex] = [1., 0., 0.]
+		vertex_normals[i_vertex] = vec3.normalize([0., 0., 0.], vertex_normals[i_vertex])
 	}
 
 	return vertex_normals

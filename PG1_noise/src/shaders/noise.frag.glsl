@@ -57,11 +57,11 @@ float perlin_noise_1d(float x) {
 	*/
 
 	/* #TODO PG1.2.1
-	Evaluate the 1D Perlin noise function at "x" as described in the handout. 
-	You will determine the two grid points surrounding x, 
-	look up their gradients, 
-	evaluate the the linear functions these gradients describe, 
-	and interpolate these values 
+	Evaluate the 1D Perlin noise function at "x" as described in the handout.
+	You will determine the two grid points surrounding x,
+	look up their gradients,
+	evaluate the the linear functions these gradients describe,
+	and interpolate these values
 	using the smooth interolation polygnomial blending_weight_poly.
 	*/
 	int a = int(floor(x));
@@ -80,10 +80,10 @@ float perlin_noise_1d(float x) {
 float perlin_fbm_1d(float x) {
 	/* #TODO PG1.3.1
 	Implement 1D fractional Brownian motion (fBm) as described in the handout.
-	You should add together num_octaves octaves of Perlin noise, starting at octave 0. 
+	You should add together num_octaves octaves of Perlin noise, starting at octave 0.
 	You also should use the frequency and amplitude multipliers:
 	freq_multiplier and ampl_multiplier defined above to rescale each successive octave.
-	
+
 	Note: the GLSL `for` loop may be useful.
 	*/
 	float fbm = 0.;
@@ -182,7 +182,7 @@ vec3 tex_perlin(vec2 point) {
 float perlin_fbm(vec2 point) {
 	/* #TODO PG1.4.2
 	Implement 2D fBm as described in the handout. Like in the 1D case, you
-	should use the constants num_octaves, freq_multiplier, and ampl_multiplier. 
+	should use the constants num_octaves, freq_multiplier, and ampl_multiplier.
 	*/
 	float fbm = 0.;
 	for(int i = 0; i < num_octaves; i++) {
@@ -235,7 +235,7 @@ const vec3 terrain_color_mountain = vec3(0.8, 0.7, 0.7);
 
 vec3 tex_map(vec2 point) {
 	/* #TODO PG1.5.1.1
-	Implement your map texture evaluation routine as described in the handout. 
+	Implement your map texture evaluation routine as described in the handout.
 	You will need to use your perlin_fbm routine and the terrain color constants described above.
 	*/
 	float fbm = perlin_fbm(point);
@@ -256,7 +256,7 @@ const vec3 brown_light 	= vec3(0.90, 0.82, 0.62);
 
 vec3 tex_wood(vec2 point) {
 	/* #TODO PG1.5.1.2
-	Implement your wood texture evaluation routine as described in thE handout. 
+	Implement your wood texture evaluation routine as described in thE handout.
 	You will need to use your 2d turbulence routine and the wood color constants described above.
 	*/
 	float turbulences = turbulence(point);
@@ -275,9 +275,7 @@ vec3 tex_marble(vec2 point) {
 	Implement your marble texture evaluation routine as described in the handout.
 	You will need to use your 2d fbm routine and the marble color constants described above.
 	*/
-	vec2 q = vec2(perlin_fbm(point), perlin_fbm(point + vec2(1.7, 4.6))); 
+	vec2 q = vec2(perlin_fbm(point), perlin_fbm(point + vec2(1.7, 4.6)));
 	float alpha = 0.5 * (1.0 + perlin_fbm(point + 4.0 * q));
 	return mix(brown_dark, white, alpha);
 }
-
-
