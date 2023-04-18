@@ -277,5 +277,5 @@ vec3 tex_marble(vec2 point) {
 	*/
 	vec2 q = vec2(perlin_fbm(point), perlin_fbm(point + vec2(1.7, 4.6)));
 	float alpha = 0.5 * (1.0 + perlin_fbm(point + 4.0 * q));
-	return mix(brown_dark, white, alpha);
+	return mix(white, brown_dark, alpha);
 }
