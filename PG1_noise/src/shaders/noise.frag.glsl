@@ -64,7 +64,18 @@ float perlin_noise_1d(float x) {
 	and interpolate these values 
 	using the smooth interolation polygnomial blending_weight_poly.
 	*/
-	return 0.;
+	int c0 = int(floor(x));
+	int c1 = c0 + 1;
+
+	vec2 gradient_at_c0 = gradients(hash_func(vec2(0, c0)));
+	vec2 gradient_at_c1 = gradients(hash_func(vec2(0, c1)));
+
+	float function_x = (x-float(c0)) * gradient_at_c0.x;
+	float function_y = (x-float(c1)) * gradient_at_c1.x;
+	float t = x - float(c0);
+	float alpha_t = blending_weight_poly(t);
+	float mix_x_y_alpha = ((1.0 - alpha_t) * function_x) + (alpha_t * function_y);
+	return mix_x_y_alpha;
 }
 
 float perlin_fbm_1d(float x) {
@@ -76,6 +87,7 @@ float perlin_fbm_1d(float x) {
 	
 	Note: the GLSL `for` loop may be useful.
 	*/
+
 	return 0.;
 }
 
