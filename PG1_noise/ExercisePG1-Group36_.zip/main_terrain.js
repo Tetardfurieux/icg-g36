@@ -93,7 +93,7 @@ async function main() {
 
 	let cam_angle_z = -0.5 // in radians!
 	let cam_angle_y = -0.42 // in radians!
-	let cam_distance_factor = 1.
+	let cam_distance_factor = 0.
 
 	let cam_target = [0, 0, 0]
 
@@ -151,7 +151,6 @@ async function main() {
 			update_cam_transform()
 			update_needed = true
 		}
-
 	})
 
 	window.addEventListener('wheel', (event) => {

@@ -1,0 +1,207 @@
+<!--
+Infinite terrain generation
+
+- Adapt noise to add peaks (ridge) and planes
+- Create clouds
+- Create a road mesh with WFC (Wave Function Collapse)
+- Spawn houses around the roads
+- Generate chunks
+- Water movement
+- Add trees
+- Process normals from noise
+- Map?
+-->
+
+<!DOCTYPE html> 
+<html>
+<head>
+    <style>
+        body
+        {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        h1
+        {
+            padding : 5px;
+            border : 5px solid green;
+            border-radius : 10px;
+            width : fit-content;
+            text-align : center;
+            color : green;
+        }
+        h2
+        {
+            width : 90%;
+            color : green;
+        }
+        #intro
+        {
+            font-size : 1.4em;
+        }
+        p
+        {
+            width : 90%;
+        }
+        img
+        {
+            width : 80%;
+        }   
+        ul
+        {
+            width : 90%;
+        }
+        table
+        {
+            border-collapse: collapse;
+        }
+        thead
+        {
+            color : green;
+            font-weight : bold;
+        }
+        tr, th, td
+        {
+            border : 1px solid green;
+            padding : 4px;
+            padding-left : 10px;
+            padding-right : 10px;
+        }
+        .w1
+        {
+            background-color: rgb(225, 241, 225);
+        }
+        .w2
+        {
+            background-color: rgb(234, 237, 234);
+        }
+        a
+        {
+            color : green;
+        }
+    </style>
+</head>
+<body>
+    <h1> Proposal Group 36 </h1>
+    <p> 
+        Antoine Roger <br/>
+        Baptiste Copros <br/>
+        Benoit Morawiec <br/>
+        <br/>
+    </p>
+    <p id="intro">
+        An infinite terrain generation tool capable of generating cities and roads.<br/>
+    </p>
+
+    <h2>
+        Type of result :  Interactive scene 
+    </h2>
+    <img alt="minecraft-village-inspiration" src="minecraft-village.png" />
+    <img alt="terrain-generation-inspiration" src="terrain_example.jpg" />
+
+    <h2>
+        Core implementations 
+    </h2>
+    <p>
+        Advanced terrain generation featuring : 
+    </p>
+    <ul>
+        <li> moutain generation using "Ridged noise" </li>
+        <li> plain generation </li>
+        <li> water movement </li>
+        <li> trees spawning </li>
+    </ul>
+
+    <p>
+        Cities and roads generation using the "Wave function collapse algorithm"
+    </p>
+
+    <h2>
+        Optional extensions 
+    </h2>
+    <ul>
+        <li> Infinite generation using chunks </li>
+        <li> Minimap in head up display </li>
+    </ul>
+    <h2>
+        Schedule 
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    Week
+                </th>
+                <th>
+                    Task 
+                </th>
+                <th>
+                    Person
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="w1">
+                <td> week 1 </td>
+                <td> Learning about Wave function collapse algorithm </td>
+                <td> Antoine </td>
+            </tr>
+            <tr class="w1">
+                <td> week 1 </td>
+                <td> Learning about more advanced noise generation algorithms </td>
+                <td> Baptiste </td>
+            </tr>
+            <tr class="w1">
+                <td> week 1 </td>
+                <td> Create the project structure and associated documentation </td>
+                <td> Benoit </td>
+            </tr>
+            <tr class="w2">
+                <td> week 2 </td>
+                <td> Generating roads </td>
+                <td> Antoine </td>
+            </tr>
+            <tr class="w2">
+                <td> week 2 </td>
+                <td> Generating plains </td>
+                <td> Baptiste </td>
+            </tr>
+            <tr class="w2">
+                <td> week 2 </td>
+                <td> Generating the clouds </td>
+                <td> Benoit </td>
+            </tr>
+            <tr class="w1">
+                <td> week 3 </td>
+                <td> Generating houses </td>
+                <td> Antoine </td>
+            </tr>
+            <tr class="w1">
+                <td> week 3 </td>
+                <td> Generating water and peaks </td>
+                <td> Baptiste</td>
+            </tr>
+            <tr class="w1">
+                <td> week 3 </td>
+                <td> Adding world setting in user interface </td>
+                <td> Benoit </td>
+            </tr>
+            <tr class="w2">
+                <td> week 4 </td>
+                <td> Extensions </td>
+                <td> Everyone </td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>
+        Bibliography / Resources
+    </h2>
+    <ul>
+        <li><a href="https://github.com/mxgmn/WaveFunctionCollapse"> github.com/mxgmn/WaveFunctionCollapse </a></li>
+        <li><a href="https://www.redblobgames.com/maps/terrain-from-noise"> www.redblobgames.com/maps/terrain-from-noise </a></li>
+    </ul>
+
+</body>
+</html>
