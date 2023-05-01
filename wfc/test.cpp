@@ -147,16 +147,28 @@ reset:
     tileset.push_back({{{0, 1, 0}, {0, 1, 1}, {0, 0, 0}}}); // up_right
     tileset.push_back({{{0, 0, 0}, {1, 1, 0}, {0, 1, 0}}}); // down_left
     tileset.push_back({{{0, 0, 0}, {0, 1, 1}, {0, 1, 0}}}); // down_right
+    tileset.push_back({{{0, 1, 0}, {0, 1, 0}, {0, 1, 0}}}); // vertical
+    tileset.push_back({{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}}); // horizontal
+    tileset.push_back({{{0, 1, 0}, {1, 1, 1}, {0, 0, 0}}}); // t_down
+    tileset.push_back({{{0, 0, 0}, {1, 1, 1}, {0, 1, 0}}}); // t_up
+    tileset.push_back({{{0, 1, 0}, {1, 1, 0}, {0, 1, 0}}}); // t_left
+    tileset.push_back({{{0, 1, 0}, {0, 1, 1}, {0, 1, 0}}}); // t_right
 
-    tileset.push_back({{{0, 2, 0}, {2, 2, 2}, {0, 2, 0}}}); // full_2
-    tileset.push_back({{{0, 0, 0}, {0, 2, 2}, {0, 0, 0}}}); // right_2
-    tileset.push_back({{{0, 0, 0}, {2, 2, 0}, {0, 0, 0}}}); // left_2
-    tileset.push_back({{{0, 2, 0}, {0, 2, 0}, {0, 0, 0}}}); // up_2
-    tileset.push_back({{{0, 0, 0}, {0, 2, 0}, {0, 2, 0}}}); // down_2
-    tileset.push_back({{{0, 2, 0}, {2, 2, 0}, {0, 0, 0}}}); // up_left_2
-    tileset.push_back({{{0, 2, 0}, {0, 2, 2}, {0, 0, 0}}}); // up_right_2
-    tileset.push_back({{{0, 0, 0}, {2, 2, 0}, {0, 2, 0}}}); // down_left_2
-    tileset.push_back({{{0, 0, 0}, {0, 2, 2}, {0, 2, 0}}}); // down_right_2
+    // tileset.push_back({{{0, 2, 0}, {2, 2, 2}, {0, 2, 0}}}); // full_2
+    // tileset.push_back({{{0, 0, 0}, {0, 2, 2}, {0, 0, 0}}}); // right_2
+    // tileset.push_back({{{0, 0, 0}, {2, 2, 0}, {0, 0, 0}}}); // left_2
+    // tileset.push_back({{{0, 2, 0}, {0, 2, 0}, {0, 0, 0}}}); // up_2
+    // tileset.push_back({{{0, 0, 0}, {0, 2, 0}, {0, 2, 0}}}); // down_2
+    // tileset.push_back({{{0, 2, 0}, {2, 2, 0}, {0, 0, 0}}}); // up_left_2
+    // tileset.push_back({{{0, 2, 0}, {0, 2, 2}, {0, 0, 0}}}); // up_right_2
+    // tileset.push_back({{{0, 0, 0}, {2, 2, 0}, {0, 2, 0}}}); // down_left_2
+    // tileset.push_back({{{0, 0, 0}, {0, 2, 2}, {0, 2, 0}}}); // down_right_2
+    // tileset.push_back({{{0, 2, 0}, {0, 2, 0}, {0, 2, 0}}}); // vertical_2
+    // tileset.push_back({{{0, 0, 0}, {2, 2, 2}, {0, 0, 0}}}); // horizontal_2
+    // tileset.push_back({{{0, 2, 0}, {2, 2, 2}, {0, 0, 0}}}); // t_down_2
+    // tileset.push_back({{{0, 0, 0}, {2, 2, 2}, {0, 2, 0}}}); // t_up_2
+    // tileset.push_back({{{0, 2, 0}, {2, 2, 0}, {0, 2, 0}}}); // t_left_2
+    // tileset.push_back({{{0, 2, 0}, {0, 2, 2}, {0, 2, 0}}}); // t_right_2
 
 
 
