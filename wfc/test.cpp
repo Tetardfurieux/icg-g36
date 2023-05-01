@@ -8,8 +8,10 @@ using namespace std;
 
 typedef array<array<int, 3>, 3> tile;
 
+const int WIDTH = 10;
+
 int rd() {
-    return rand() % 5;
+    return rand() % WIDTH;
 }
 
 bool check_bottom(tile current, tile under) {
@@ -75,8 +77,8 @@ void compute_entropy(vector<tile> tileset, vector<vector<tile>> map, vector<vect
 
 
 bool check_converged(vector<vector<bool>> converged) {
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5 ; j++) {
+    for (int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < WIDTH ; j++) {
             if (!converged[i][j]) {
                 return false;
             }
@@ -87,10 +89,10 @@ bool check_converged(vector<vector<bool>> converged) {
 
 void draw_map(vector<vector<tile>> map) {
 
-    vector<vector<int>> final = vector<vector<int>>(5*3, vector<int>(5*3));
+    vector<vector<int>> final = vector<vector<int>>(WIDTH*3, vector<int>(WIDTH*3));
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5 ; j++) {
+    for (int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < WIDTH ; j++) {
             for (int k = 0; k < 3; k++) {
                 for (int l = 0; l < 3 ; l++) {
                     final[i*3+k][j*3+l] = map[i][j][k][l];
@@ -101,7 +103,13 @@ void draw_map(vector<vector<tile>> map) {
     
     for (int i = 0; i < final.size(); i++) {
         for (int j = 0; j < final.size(); j++) {
-            cout << final[i][j];
+            if (final[i][j] == 0) {
+                cout << " ";
+            } else if (final[i][j] == 1) {
+                cout << "█";
+            } else {
+                cout << ".";
+            }
         }
         cout << endl;
     }
@@ -109,8 +117,8 @@ void draw_map(vector<vector<tile>> map) {
 
 void draw_entropy(vector<vector<vector<tile>>> candidates) {
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5 ; j++) {
+    for (int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < WIDTH ; j++) {
             cout << candidates[i][j].size() << " ";
         }
         cout << endl;
@@ -122,13 +130,14 @@ reset:
 
     srand(time(NULL));
 
-    vector<vector<tile>> map = vector<vector<tile>>(5, vector<tile>(5));
-    vector<vector<bool>> converged = vector<vector<bool>>(5, vector<bool>(5));
-    vector<vector<vector<tile>>> candidates = vector<vector<vector<tile>>>(5, vector<vector<tile>>(5));
+    vector<vector<tile>> map = vector<vector<tile>>(WIDTH, vector<tile>(WIDTH));
+    vector<vector<bool>> converged = vector<vector<bool>>(WIDTH, vector<bool>(WIDTH));
+    vector<vector<vector<tile>>> candidates = vector<vector<vector<tile>>>(WIDTH, vector<vector<tile>>(WIDTH));
 
     vector<tile> tileset = vector<tile>();
 
     tileset.push_back({{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}}); // empty
+
     tileset.push_back({{{0, 1, 0}, {1, 1, 1}, {0, 1, 0}}}); // full
     tileset.push_back({{{0, 0, 0}, {0, 1, 1}, {0, 0, 0}}}); // right
     tileset.push_back({{{0, 0, 0}, {1, 1, 0}, {0, 0, 0}}}); // left
@@ -139,15 +148,28 @@ reset:
     tileset.push_back({{{0, 0, 0}, {1, 1, 0}, {0, 1, 0}}}); // down_left
     tileset.push_back({{{0, 0, 0}, {0, 1, 1}, {0, 1, 0}}}); // down_right
 
+    tileset.push_back({{{0, 2, 0}, {2, 2, 2}, {0, 2, 0}}}); // full_2
+    tileset.push_back({{{0, 0, 0}, {0, 2, 2}, {0, 0, 0}}}); // right_2
+    tileset.push_back({{{0, 0, 0}, {2, 2, 0}, {0, 0, 0}}}); // left_2
+    tileset.push_back({{{0, 2, 0}, {0, 2, 0}, {0, 0, 0}}}); // up_2
+    tileset.push_back({{{0, 0, 0}, {0, 2, 0}, {0, 2, 0}}}); // down_2
+    tileset.push_back({{{0, 2, 0}, {2, 2, 0}, {0, 0, 0}}}); // up_left_2
+    tileset.push_back({{{0, 2, 0}, {0, 2, 2}, {0, 0, 0}}}); // up_right_2
+    tileset.push_back({{{0, 0, 0}, {2, 2, 0}, {0, 2, 0}}}); // down_left_2
+    tileset.push_back({{{0, 0, 0}, {0, 2, 2}, {0, 2, 0}}}); // down_right_2
+
+
+
     int x = rd();
     int y = rd();
 
 
-    map[x][y] = tileset[1];
+    map[3][3] = tileset[1];
 
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5 ; j++) {
+
+    for (int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < WIDTH ; j++) {
             if (i == x && j == y) {
                 converged[i][j] = true;
                 continue;
@@ -159,39 +181,41 @@ reset:
     int max = 0;
 
     while (!check_converged(converged)) {
-        if (max > 100) {
+        if (max > 10000) {
+            break;
             goto reset;
         }
         max++;
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5 ; j++) {
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < WIDTH ; j++) {
                 candidates[i][j].clear();
             }
         }
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5 ; j++) {
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < WIDTH ; j++) {
                 compute_entropy(tileset, map, candidates, converged, i, j);
             }
         }
 
-        draw_entropy(candidates);
+        // draw_entropy(candidates);
+        draw_map(map);
         cout << "------------------" << endl;
 
         bool foundMin = false;
-        for (int k = 1; k < map.size(); k++) {
+        for (int k = 1; k < tileset.size(); k++) {
             if (foundMin) {
                 break;
             }
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 5 ; j++) {
+            for (int i = 0; i < WIDTH; i++) {
+                for (int j = 0; j < WIDTH ; j++) {
                     if (candidates[i][j].size() == k) {
                         foundMin = true;
                         if (k == 1) {
                             map[i][j] = candidates[i][j][0];
                         }
                         else {
-                            int r = rd();
+                            int r = rand() % k;
                             map[i][j] = candidates[i][j][r];
                         }
                         converged[i][j] = true;
