@@ -14,6 +14,7 @@ int rd() {
     return rand() % WIDTH;
 }
 
+// check if the bottom line of the current tile matches the top line of the under tile
 bool check_bottom(tile current, tile under) {
     for (int i = 0; i < 3; i++) {
         if (current[2][i] != under[0][i]) {
@@ -23,6 +24,7 @@ bool check_bottom(tile current, tile under) {
     return true;
 }
 
+// check if the top line of the current tile matches the bottom line of the above tile
 bool check_top(tile current, tile above) {
     for (int i = 0; i < 3; i++) {
         if (current[0][i] != above[2][i]) {
@@ -32,6 +34,7 @@ bool check_top(tile current, tile above) {
     return true;
 }
 
+// check if the right line of the current tile matches the left line of the right tile
 bool check_right(tile current, tile right) {
     for (int i = 0; i < 3; i++) {
         if (current[i][2] != right[i][0]) {
@@ -41,6 +44,7 @@ bool check_right(tile current, tile right) {
     return true;
 }
 
+// check if the left line of the current tile matches the right line of the left tile
 bool check_left(tile current, tile left) {
     for (int i = 0; i < 3; i++) {
         if (current[i][0] != left[i][2]) {
@@ -50,6 +54,7 @@ bool check_left(tile current, tile left) {
     return true;
 }
 
+// for each slot in the map, fill it with remaining candidates
 void compute_entropy(vector<tile> tileset, vector<vector<tile>> map, vector<vector<vector<tile>>>& candidates, vector<vector<bool>> converged, int x, int y) {
     if (converged[x][y]) {
         return;
@@ -75,7 +80,7 @@ void compute_entropy(vector<tile> tileset, vector<vector<tile>> map, vector<vect
 
 }
 
-
+// check if the map is fully converged
 bool check_converged(vector<vector<bool>> converged) {
     for (int i = 0; i < WIDTH; i++) {
         for (int j = 0; j < WIDTH ; j++) {
