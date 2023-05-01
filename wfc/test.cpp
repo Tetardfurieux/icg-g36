@@ -118,6 +118,8 @@ void draw_entropy(vector<vector<vector<tile>>> candidates) {
 }
 
 int main() {
+reset:
+
     srand(time(NULL));
 
     vector<vector<tile>> map = vector<vector<tile>>(5, vector<tile>(5));
@@ -154,7 +156,14 @@ int main() {
         }
     }
 
+    int max = 0;
+
     while (!check_converged(converged)) {
+        if (max > 100) {
+            goto reset;
+        }
+        max++;
+
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5 ; j++) {
                 candidates[i][j].clear();
