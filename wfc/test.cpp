@@ -181,8 +181,7 @@ reset:
     int max = 0;
 
     while (!check_converged(converged)) {
-        if (max > 10000) {
-            break;
+        if (max > 100) {
             goto reset;
         }
         max++;
