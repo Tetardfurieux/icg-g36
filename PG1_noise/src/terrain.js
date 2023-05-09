@@ -1,4 +1,4 @@
-import {vec2, vec3, vec4, mat2, mat3, mat4} from "../lib/gl-matrix_3.3.0/esm/index.js"
+import {mat3, mat4, vec3} from "../lib/gl-matrix_3.3.0/esm/index.js"
 import {mat4_matmul_many} from "./icg_math.js"
 
 class BufferData {
@@ -46,7 +46,7 @@ function check_top(current, above) {
 
 function check_left(current, left) {
 	for (let i = 0; i < 3; ++i) {
-		if (current[i][0] !== left[i][2]) {
+		if (current[0][i] !== left[2][i]) {
 			return false
 		}
 	}
@@ -55,7 +55,7 @@ function check_left(current, left) {
 
 function check_right(current, right) {
 	for (let i = 0; i < 3; ++i) {
-		if (current[i][2] !== right[i][0]) {
+		if (current[2][i] !== right[0][i]) {
 			return false
 		}
 	}
@@ -64,34 +64,38 @@ function check_right(current, right) {
 
 function check_converged(candidates) {
 	for (let i = 0; i < candidates.length; ++i) {
-		if (candidates[i] > 0) {
+		if (candidates[i].length > 1) {
 			return false
 		}
 	}
+	console.log("converged")
 	return true
 }
 
 
 function compute_candidates(tileset, map, candidates, x, y) {
 	let result = []
+	if (candidates[x][y].length === 0) {
+		return result
+	}
 	for (let i = 0; i < tileset.length; ++i) {
 		let candidate = tileset[i]
 		let valid = true
-		if (x > 0 && candidates[map[x - 1][y]] > 0 && !check_left(candidate, tileset[map[x - 1][y]])) {
+		if (x > 0 && candidates[x - 1][y].length === 0 && !check_left(candidate, map[x - 1][y])) {
 			valid = false
 		}
-		if (x < map.length - 1 && candidates[map[x + 1][y]] > 0 && !check_right(candidate, tileset[map[x + 1][y]])) {
+		if (x < map.length - 1 && candidates[x + 1][y].length === 0 && !check_right(candidate, map[x + 1][y])) {
 			valid = false
 		}
-		if (y > 0 && candidates[map[x][y - 1]] > 0 && !check_top(candidate, tileset[map[x][y - 1]])) {
+		if (y > 0 && candidates[x][y - 1].length === 0 && !check_top(candidate, map[x][y - 1])) {
 			valid = false
 		}
-		if (y < map[0].length - 1 && candidates[map[x][y + 1]] > 0 && !check_bottom(candidate, tileset[map[x][y + 1]])) {
+		if (y < map[0].length - 1 && candidates[x][y + 1].length === 0 && !check_bottom(candidate, map[x][y + 1])) {
 			valid = false
 		}
 
 		if (valid) {
-			result.push(tileset[i])
+			result.push(candidate)
 		}
 
 	}
@@ -100,8 +104,8 @@ function compute_candidates(tileset, map, candidates, x, y) {
 }
 
 function wfc_build_mesh(height_map) {
-	const grid_width = height_map.width
-	const grid_height = height_map.height
+	const grid_width = 3 // height_map.width
+	const grid_height = 3 // height_map.height
 
 	const WATER_LEVEL = -0.03125
 
@@ -121,15 +125,101 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[0, 0, 0], [1, 1, 1], [0, 0, 0]]) // left right
 	tileset.push([[0, 1, 0], [0, 1, 1], [0, 1, 0]]) // top right bottom
 	tileset.push([[0, 1, 0], [1, 1, 0], [0, 1, 0]]) // top left bottom
-	tileset.push([[0, 1, 0], [1, 1, 1], [0, 1, 0]]) // top left right
-	tileset.push([[0, 1, 0], [1, 1, 1], [0, 1, 1]]) // top left right bottom
 
 
-	let candidates = []
+	let candidates = Array.from(Array(grid_width), () => new Array(grid_height))
 
-	let map = new Array(grid_width).map(() => new Array(grid_height).fill(0))
+	let map = Array.from(Array(grid_width), () => new Array(grid_height))
 
-	// let (x, _) = random(grid_width)
+	let x = Math.floor(Math.random() * grid_width)
+	let y = Math.floor(Math.random() * grid_height)
+
+
+	console.log(x, y)
+
+	for (let i = 0; i < grid_width; ++i) {
+		for (let j = 0; j < grid_height; ++j) {
+			if (i === x && j === y) {
+				map[i][j] = tileset[1]
+				candidates[i][j] = []
+			}
+			else {
+				map[i][j] = []
+				candidates[i][j] = tileset
+			}
+		}
+	}
+
+	let count = 0
+	while (!check_converged(candidates)) {
+		if (count > 10) {
+			break
+		}
+		count++
+		console.log(count)
+
+		for (let i = 0; i < grid_width; ++i) {
+			for (let j = 0; j < grid_height; ++j) {
+				if (candidates[i][j] > 0) {
+					candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
+				}
+			}
+		}
+		let foundMin = false
+		for (let k = 1; k <= tileset.length; k++) {
+			if (foundMin) {
+				break
+			}
+			for (let i = 0; i < grid_width; ++i) {
+				if (foundMin) {
+					break
+				}
+				for (let j = 0; j < grid_height; ++j) {
+					// console.log(candidates[i][j].length)
+					if (candidates[i][j].length === k) {
+						let r = Math.floor(Math.random() * candidates[i][j].length)
+						console.log(i, j, r)
+						console.log(candidates[i][j][r])
+						map[i][j] = candidates[i][j][r]
+						console.log(map)
+						candidates[i][j] = []
+						foundMin = true
+					}
+				}
+			}
+
+		}
+
+	}
+
+	console.log("done")
+
+	// console.log(map)
+	let drawMap = Array.from(Array(3*grid_width), () => new Array(3*grid_height))
+	for (let i = 0; i < 3*grid_width; ++i) {
+		for (let j = 0; j < 3*grid_height; ++j) {
+			drawMap[i][j] = []
+		}
+	}
+
+	for (let i = 0; i < grid_width; ++i) {
+		for (let j = 0; j < grid_height; ++j) {
+			for (let k = 0; k < 3; k++) {
+				for (let l = 0; l < 3; l++) {
+					drawMap[i*3+k][j*3+l] = map[i][j][k][l]
+				}
+			}
+		}
+	}
+
+
+	for (let i = 0; i < 3*grid_width; ++i) {
+		let line = ""
+		for (let j = 0; j < 3*grid_height; ++j) {
+			line += drawMap[i][j]
+		}
+		console.log(line)
+	}
 
 
 
@@ -268,7 +358,7 @@ function terrain_build_mesh(height_map) {
 
 export function init_terrain(regl, resources, height_map_buffer) {
 
-	const terrain_mesh = terrain_build_mesh(new BufferData(regl, height_map_buffer))
+	const terrain_mesh = wfc_build_mesh(new BufferData(regl, height_map_buffer))
 
 	const pipeline_draw_terrain = regl({
 		attributes: {
