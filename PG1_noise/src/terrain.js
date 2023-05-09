@@ -104,8 +104,8 @@ function compute_candidates(tileset, map, candidates, x, y) {
 }
 
 function wfc_build_mesh(height_map) {
-	const grid_width = 5 // height_map.width
-	const grid_height = 5 // height_map.height
+	let grid_width = 5 // height_map.width
+	let grid_height = 5 // height_map.height
 
 	const WATER_LEVEL = -0.03125
 
@@ -241,6 +241,8 @@ function wfc_build_mesh(height_map) {
 	}
 
 
+	grid_width = 3*grid_width
+	grid_height = 3*grid_height
 
 	const vertices = []
 	const normals = []
