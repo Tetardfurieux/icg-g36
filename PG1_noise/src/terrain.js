@@ -104,8 +104,8 @@ function compute_candidates(tileset, map, candidates, x, y) {
 }
 
 function wfc_build_mesh(height_map) {
-	const grid_width = 3 // height_map.width
-	const grid_height = 3 // height_map.height
+	const grid_width = 5 // height_map.width
+	const grid_height = 5 // height_map.height
 
 	const WATER_LEVEL = -0.03125
 
@@ -125,6 +125,25 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[0, 0, 0], [1, 1, 1], [0, 0, 0]]) // left right
 	tileset.push([[0, 1, 0], [0, 1, 1], [0, 1, 0]]) // top right bottom
 	tileset.push([[0, 1, 0], [1, 1, 0], [0, 1, 0]]) // top left bottom
+	tileset.push([[0, 1, 0], [1, 1, 1], [0, 0, 0]]) // top left right
+	tileset.push([[0, 0, 0], [1, 1, 1], [0, 1, 0]]) // bottom left right
+
+	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
+	tileset.push([[0, 2, 0], [2, 2, 2], [0, 2, 0]]) // full
+	tileset.push([[0, 0, 0], [0, 2, 2], [0, 0, 0]]) // right
+	tileset.push([[0, 0, 0], [2, 2, 0], [0, 0, 0]]) // left
+	tileset.push([[0, 2, 0], [0, 2, 0], [0, 0, 0]]) // top
+	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 0]]) // bottom
+	tileset.push([[0, 2, 0], [0, 2, 2], [0, 0, 0]]) // top right
+	tileset.push([[0, 2, 0], [2, 2, 0], [0, 0, 0]]) // top left
+	tileset.push([[0, 0, 0], [2, 2, 0], [0, 2, 0]]) // bottom left
+	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 2]]) // bottom right
+	tileset.push([[0, 2, 0], [0, 2, 0], [0, 2, 0]]) // top bottom
+	tileset.push([[0, 0, 0], [2, 2, 2], [0, 0, 0]]) // left right
+	tileset.push([[0, 2, 0], [0, 2, 2], [0, 2, 0]]) // top right bottom
+	tileset.push([[0, 2, 0], [2, 2, 0], [0, 2, 0]]) // top left bottom
+	tileset.push([[0, 2, 0], [2, 2, 2], [0, 0, 0]]) // top left right
+	tileset.push([[0, 0, 0], [2, 2, 2], [0, 2, 0]]) // bottom left right
 
 
 	let candidates = Array.from(Array(grid_width), () => new Array(grid_height))
@@ -135,7 +154,7 @@ function wfc_build_mesh(height_map) {
 	let y = Math.floor(Math.random() * grid_height)
 
 
-	console.log(x, y)
+	// console.log(x, y)
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
@@ -156,7 +175,7 @@ function wfc_build_mesh(height_map) {
 			break
 		}
 		count++
-		console.log(count)
+		// console.log(count)
 
 		for (let i = 0; i < grid_width; ++i) {
 			for (let j = 0; j < grid_height; ++j) {
@@ -178,10 +197,10 @@ function wfc_build_mesh(height_map) {
 					// console.log(candidates[i][j].length)
 					if (candidates[i][j].length === k) {
 						let r = Math.floor(Math.random() * candidates[i][j].length)
-						console.log(i, j, r)
-						console.log(candidates[i][j][r])
+						// console.log(i, j, r)
+						// console.log(candidates[i][j][r])
 						map[i][j] = candidates[i][j][r]
-						console.log(map)
+						// console.log(map)
 						candidates[i][j] = []
 						foundMin = true
 					}
@@ -192,7 +211,7 @@ function wfc_build_mesh(height_map) {
 
 	}
 
-	console.log("done")
+	// console.log("done")
 
 	// console.log(map)
 	let drawMap = Array.from(Array(3*grid_width), () => new Array(3*grid_height))
