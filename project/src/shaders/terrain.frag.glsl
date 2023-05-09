@@ -8,8 +8,7 @@ varying vec3 vertex_position;
 varying vec3 v2f_light_position;
 
 
-const vec3  light_color
-	float height = v2f_height = vec3(1.0, 0.941, 0.898);
+const vec3  light_color = vec3(1.0, 0.941, 0.898);
 // Small perturbation to prevent "z-fighting" on the water on some machines...
 const float terrain_water_level    = -0.03125 + 1e-6;
 const vec3  terrain_color_water    = vec3(0.29, 0.51, 0.62);
@@ -18,7 +17,8 @@ const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
 void main()
 {
-	const vec3 ambient = 0.2 * light_color; // Ambient light intensity;
+	const vec3 ambient = 0.2 * light_color; // Ambient light intensity
+	float height = v2f_height;
 
 	/* #TODO PG1.6.1
 	Compute the terrain color ("material") and shininess based on the height as
