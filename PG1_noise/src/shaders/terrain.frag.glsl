@@ -15,6 +15,8 @@ const vec3  terrain_color_water    = vec3(0.29, 0.51, 0.62);
 const vec3  terrain_color_mountain = vec3(0.8, 0.5, 0.4);
 const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
+varying float value;
+
 void main()
 {
 	const vec3 ambient = 0.2 * light_color; // Ambient light intensity
@@ -34,7 +36,8 @@ void main()
 	vec3 material_color = terrain_color_grass; // Initial value
 	float shininess = 0.5;
 
-	if(height < terrain_water_level){
+	// if(height < terrain_water_level){
+	if (int(value) == 0) {
 		material_color = terrain_color_water;
 		shininess = 30.;
 	}

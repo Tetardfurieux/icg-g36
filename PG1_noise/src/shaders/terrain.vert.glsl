@@ -13,6 +13,12 @@ uniform mat4 mat_model_view;
 uniform mat3 mat_normals; // mat3 not 4, because normals are only rotated and not translated
 
 uniform vec4 light_position; //in camera space coordinates already
+
+
+// get array of float from uniform
+uniform int values[225];
+varying float value;
+
 void main()
 {
     v2f_height = position.z;
@@ -38,4 +44,9 @@ void main()
     v2f_light_position = vec3(light_position);
 	
 	gl_Position = mat_mvp * position_v4;
+
+    int test = values[0];
+
+
+    value = float(test); //values[0];
 }

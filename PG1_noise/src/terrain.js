@@ -215,6 +215,8 @@ function wfc_build_mesh(height_map) {
 
 	// console.log(map)
 	let drawMap = Array.from(Array(3*grid_width), () => new Array(3*grid_height))
+	let values = []
+
 	for (let i = 0; i < 3*grid_width; ++i) {
 		for (let j = 0; j < 3*grid_height; ++j) {
 			drawMap[i][j] = []
@@ -236,6 +238,7 @@ function wfc_build_mesh(height_map) {
 		let line = ""
 		for (let j = 0; j < 3*grid_height; ++j) {
 			line += drawMap[i][j]
+			values.push(drawMap[i][j])
 		}
 		console.log(line)
 	}
@@ -300,10 +303,12 @@ function wfc_build_mesh(height_map) {
 		}
 	}
 
+
 	return {
 		vertex_positions: vertices,
 		vertex_normals: normals,
 		faces: faces,
+		vertex_values: values,
 	}
 }
 
@@ -392,6 +397,7 @@ export function init_terrain(regl, resources, height_map_buffer) {
 			mat_normals: regl.prop('mat_normals'),
 
 			light_position: regl.prop('light_position'),
+			values: terrain_mesh.vertex_values,
 		},
 		elements: terrain_mesh.faces,
 
