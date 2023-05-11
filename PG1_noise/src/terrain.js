@@ -283,7 +283,8 @@ function wfc_build_mesh(height_map) {
 				z = WATER_LEVEL;
 				normals[idx] = [0, 0, 1];
 			}
-			vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
+			vertices[idx] = [gx, gy, z];
+			// vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
 		}
 	}
 
@@ -303,6 +304,7 @@ function wfc_build_mesh(height_map) {
 		}
 	}
 
+	console.log(vertices)
 
 	return {
 		vertex_positions: vertices,

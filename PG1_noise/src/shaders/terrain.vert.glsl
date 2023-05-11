@@ -43,10 +43,16 @@ void main()
 	vertex_position = eye_space_position;
     v2f_light_position = vec3(light_position);
 	
+	// gl_Position = vec4(values[0]);
 	gl_Position = mat_mvp * position_v4;
 
-    int test = values[0];
+    float x = position.x + 0.5;
+    x *= 15.0;
+    float y = position.y + 0.5;
+    y *= 15.0;
 
+    // float test = floor(x) + float(15) * floor(y);
+    float test = position.x + float(15) * position.y;
 
-    value = float(test); //values[0];
+    value = float(values[int(test)]);
 }
