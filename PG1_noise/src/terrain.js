@@ -373,6 +373,13 @@ function wfc_build_mesh(height_map) {
 				normals[idx] = [0, 0, 1];
 			}
 
+			if (gx > 0 && drawMap[gx - 1][gy] === 0) {
+				z = WATER_LEVEL;
+			}
+			if (gy > 0 && drawMap[gx][gy - 1] === 0) {
+				z = WATER_LEVEL;
+			}
+
 			//vertices[idx] = [gx, gy, z];
 			//if(drawMap[gx][gy] !== 0) {
 				vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
@@ -380,6 +387,7 @@ function wfc_build_mesh(height_map) {
 			//}
 		}
 	}
+
 
 	for(let gy = 0; gy < grid_height - 1; gy++) {
 		for(let gx = 0; gx < grid_width - 1; gx++) {
