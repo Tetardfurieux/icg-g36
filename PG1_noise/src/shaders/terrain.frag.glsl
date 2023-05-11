@@ -40,8 +40,18 @@ void main()
 	vec3 material_color = terrain_color_grass; // Initial value
 	float shininess = 0.5;
 
+	
+    float x = pos_out.x + 0.5;
+    x *= 15.0;
+    float y = pos_out.y + 0.5;
+    y *= 15.0;
 
-	int test = int(floor(pos_out.x) + float(15) * floor(pos_out.y));
+    // // float test = floor(x) + float(15) * floor(y);
+    // float test = floor(position.x) + float(15) * floor(position.y);
+
+    // value = float(values[int(test)]);
+
+	int test = int(floor(x) + float(15) * floor(y));
 
 	float value = 0.0;
 
