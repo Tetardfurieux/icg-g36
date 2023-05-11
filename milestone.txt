@@ -1,0 +1,11 @@
+Implemented WFC algorithm to generate a terrain with 3-4 tiles using PG1 structure.
+
+<insert Benoit's work>
+
+<insert screen>
+
+Schedule: 
+
+Week 3: Implement probas for the different tiles + starting some extension
+Week 4: Extension and video 
+
