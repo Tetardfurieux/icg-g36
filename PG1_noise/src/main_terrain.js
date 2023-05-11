@@ -89,7 +89,7 @@ async function main() {
 		Camera
 	---------------------------------------------------------------*/
 	const mat_turntable = mat4.create()
-	const cam_distance_base = 5.75
+	const cam_distance_base = 0.75
 
 	let cam_angle_z = -0.5 // in radians!
 	let cam_angle_y = -0.42 // in radians!

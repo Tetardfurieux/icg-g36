@@ -112,7 +112,7 @@ function wfc_build_mesh(height_map) {
 	// let map be an array of 3x3 arrays of ints
 	let tileset = []
 	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
-	tileset.push([[0, 1, 0], [1, 1, 1], [0, 1, 0]]) // full
+	/*tileset.push([[0, 1, 0], [1, 1, 1], [0, 1, 0]]) // full
 	tileset.push([[0, 0, 0], [0, 1, 1], [0, 0, 0]]) // right
 	tileset.push([[0, 0, 0], [1, 1, 0], [0, 0, 0]]) // left
 	tileset.push([[0, 1, 0], [0, 1, 0], [0, 0, 0]]) // top
@@ -143,7 +143,21 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[0, 2, 0], [0, 2, 2], [0, 2, 0]]) // top right bottom
 	tileset.push([[0, 2, 0], [2, 2, 0], [0, 2, 0]]) // top left bottom
 	tileset.push([[0, 2, 0], [2, 2, 2], [0, 0, 0]]) // top left right
-	tileset.push([[0, 0, 0], [2, 2, 2], [0, 2, 0]]) // bottom left right
+	tileset.push([[0, 0, 0], [2, 2, 2], [0, 2, 0]]) // bottom left right*/
+	tileset.push([[0, 0, 0], [1, 1, 1], [1, 1, 1]])
+	tileset.push([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
+	tileset.push([[1, 1, 1], [1, 1, 1], [0, 0, 0]])
+	tileset.push([[0, 1, 1], [0, 1, 1], [0, 1, 1]])
+	tileset.push([[1, 1, 0], [1, 1, 0], [1, 1, 0]])
+
+	tileset.push([[2, 2, 2], [2, 2, 2], [2, 2, 2]])
+	tileset.push([[0, 0, 0], [2, 2, 2], [2, 2, 2]])
+	tileset.push([[2, 2, 2], [2, 2, 2], [0, 0, 0]])
+	tileset.push([[0, 2, 2], [0, 2, 2], [0, 2, 2]])
+	tileset.push([[2, 2, 0], [2, 2, 0], [2, 2, 0]])
+
+	
+
 
 
 	let candidates = Array.from(Array(grid_width), () => new Array(grid_height))
@@ -167,7 +181,7 @@ function wfc_build_mesh(height_map) {
 			// 	candidates[i][j] = tileset
 			// }
 			
-			map[i][j] = []
+			map[i][j] = tileset[0]
 			candidates[i][j] = tileset
 		}
 	}
@@ -284,12 +298,36 @@ function wfc_build_mesh(height_map) {
 			The XY coordinates are calculated so that the full grid covers the square [-0.5, 0.5]^2 in the XY plane.
 			*/
 			let z = height_map.get(gx, gy) - 0.5;
-			if (z < WATER_LEVEL) {
+			/*if (z < WATER_LEVEL) {
 				z = WATER_LEVEL;
 				normals[idx] = [0, 0, 1];
+			}*/
+			let va = xy_to_v_index(gx, gy);
+			let vb = xy_to_v_index(gx + 1, gy);
+			let vc = xy_to_v_index(gx, gy + 1);
+			let vd = xy_to_v_index(gx + 1, gy + 1);
+
+			if(drawMap[gx][gy] === 0) {
+				z = WATER_LEVEL;
+				/*vertices[va] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
+				vertices[vb] = [(gx + 1)/ grid_width - 0.5, gy / grid_height - 0.5, z];
+				vertices[vc] = [gx / grid_width - 0.5, (gy + 1) / grid_height - 0.5, z];
+				vertices[vd] = [(gx + 1)/ grid_width - 0.5, (gy + 1) / grid_height - 0.5, z];*/
+				normals[idx] = [0, 0, 1];
 			}
-			vertices[idx] = [gx, gy, z];
-			// vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
+			else if(drawMap[gx][gy] === 1) {
+				z = 0.;
+				normals[idx] = [0, 0, 1];
+			}
+			else{
+				z = 0.;
+				normals[idx] = [0, 0, 1];
+			}
+
+			//vertices[idx] = [gx, gy, z];
+			//if(drawMap[gx][gy] !== 0) {
+				vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
+			//}
 		}
 	}
 
