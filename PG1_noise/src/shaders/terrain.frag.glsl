@@ -71,12 +71,6 @@ void main()
 	}
 
 
-	if (int(pos_out.x) == 3) {
-		material_color = vec3(1., 0., 0.);
-	}
-	else if (int(pos_out.y) == 0) {
-		material_color = vec3(0., 1., 0.);
-	}
 
 	// material_color = vec3()
 

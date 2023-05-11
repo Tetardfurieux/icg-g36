@@ -64,7 +64,7 @@ function check_right(current, right) {
 
 function check_converged(candidates) {
 	for (let i = 0; i < candidates.length; ++i) {
-		if (candidates[i].length > 1) {
+		if (candidates[i].length >= 1) {
 			return false
 		}
 	}
@@ -158,20 +158,24 @@ function wfc_build_mesh(height_map) {
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			if (i === x && j === y) {
-				map[i][j] = tileset[1]
-				candidates[i][j] = []
-			}
-			else {
-				map[i][j] = []
-				candidates[i][j] = tileset
-			}
+			// if (i === x && j === y) {
+			// 	map[i][j] = tileset[1]
+			// 	candidates[i][j] = []
+			// }
+			// else {
+			// 	map[i][j] = []
+			// 	candidates[i][j] = tileset
+			// }
+			
+			map[i][j] = []
+			candidates[i][j] = tileset
 		}
 	}
 
 	let count = 0
 	while (!check_converged(candidates)) {
-		if (count > 10) {
+		if (count > 100) {
+			console.log("failed")
 			break
 		}
 		count++
@@ -190,7 +194,7 @@ function wfc_build_mesh(height_map) {
 				break
 			}
 			for (let i = 0; i < grid_width; ++i) {
-				if (foundMin) {
+				if (foundMin) { //TODO
 					break
 				}
 				for (let j = 0; j < grid_height; ++j) {
@@ -203,6 +207,7 @@ function wfc_build_mesh(height_map) {
 						// console.log(map)
 						candidates[i][j] = []
 						foundMin = true
+						break
 					}
 				}
 			}
