@@ -164,6 +164,15 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[0, 2, 2], [0, 2, 2], [0, 0, 0]])
 	tileset.push([[2, 2, 0], [2, 2, 0], [0, 0, 0]])
 
+	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]])
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]])
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]])
+	tileset.push([[0, 0, 0], [2, 2, 2], [2, 3, 2]])
+	tileset.push([[2, 3, 2], [2, 2, 2], [0, 0, 0]])
+	tileset.push([[0, 2, 2], [0, 2, 3], [0, 2, 2]])
+	tileset.push([[2, 2, 0], [3, 2, 0], [2, 2, 0]])
+
+
 	
 
 
@@ -265,7 +274,7 @@ function wfc_build_mesh(height_map) {
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
 			if (map[i][j].length === 0) {
-				map[i][j] = [[3, 3, 3], [3, 3, 3], [3, 3, 3]]
+				map[i][j] = [[4, 4, 4], [4, 4, 4], [4, 4, 4]]
 			}
 		}
 	}

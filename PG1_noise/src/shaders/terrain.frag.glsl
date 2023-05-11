@@ -70,13 +70,18 @@ void main()
 		material_color = terrain_color_water;
 		shininess = 30.;
 	}
-	else if (int(value) == 1) {
+	else if (int(value) == 2) {
 		material_color = terrain_color_grass;
 		shininess = 2.;
 	}
-	else if (int(value) == 2) {
+	else if (int(value) == 1) {
 		// material_color = mix(terrain_color_grass, terrain_color_mountain, (height - terrain_water_level)*2.);
 		material_color = terrain_color_mountain;
+		shininess = 2.;
+	}
+	else if (int(value) == 3) {
+		// material_color = mix(terrain_color_grass, terrain_color_mountain, (height - terrain_water_level)*2.);
+		material_color = vec3(0.2, 0.2, 0.2);
 		shininess = 2.;
 	}
 	else {
