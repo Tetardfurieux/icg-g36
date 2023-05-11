@@ -16,8 +16,9 @@ uniform vec4 light_position; //in camera space coordinates already
 
 
 // get array of float from uniform
-uniform int values[225];
-varying float value;
+// uniform int values[225];
+
+varying vec3 pos_out;
 
 void main()
 {
@@ -46,13 +47,21 @@ void main()
 	// gl_Position = vec4(values[0]);
 	gl_Position = mat_mvp * position_v4;
 
-    float x = position.x + 0.5;
-    x *= 15.0;
-    float y = position.y + 0.5;
-    y *= 15.0;
 
-    // float test = floor(x) + float(15) * floor(y);
-    float test = position.x + float(15) * position.y;
 
-    value = float(values[int(test)]);
+
+    // float x = position.x + 0.5;
+    // x *= 15.0;
+    // float y = position.y + 0.5;
+    // y *= 15.0;
+
+    // // float test = floor(x) + float(15) * floor(y);
+    // float test = floor(position.x) + float(15) * floor(position.y);
+
+    // value = float(values[int(test)]);
+
+
+
+
+    pos_out = position;
 }

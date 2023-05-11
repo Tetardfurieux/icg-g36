@@ -15,7 +15,11 @@ const vec3  terrain_color_water    = vec3(0.29, 0.51, 0.62);
 const vec3  terrain_color_mountain = vec3(0.8, 0.5, 0.4);
 const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
-varying float value;
+// varying float value;
+
+uniform int values[225];
+
+varying vec3 pos_out;
 
 void main()
 {
@@ -36,6 +40,21 @@ void main()
 	vec3 material_color = terrain_color_grass; // Initial value
 	float shininess = 0.5;
 
+
+	int test = int(floor(pos_out.x) + float(15) * floor(pos_out.y));
+
+	float value = 0.0;
+
+	for (int x = 0; x < 225; x++) { 
+		if (x == test) {
+			value = float(values[x]);
+		}
+	}
+
+
+
+
+
 	// if(height < terrain_water_level){
 	if (int(value) == 0) {
 		material_color = terrain_color_water;
@@ -50,6 +69,17 @@ void main()
 		material_color = terrain_color_mountain;
 		shininess = 2.;
 	}
+
+
+	if (int(pos_out.x) == 3) {
+		material_color = vec3(1., 0., 0.);
+	}
+	else if (int(pos_out.y) == 0) {
+		material_color = vec3(0., 1., 0.);
+	}
+
+	// material_color = vec3()
+
 
 	/* #TODO PG1.6.1: apply the Blinn-Phong lighting model
     	Implement the Phong shading model by using the passed variables and write the resulting color to `color`.

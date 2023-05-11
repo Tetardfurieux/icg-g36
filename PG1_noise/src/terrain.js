@@ -234,11 +234,11 @@ function wfc_build_mesh(height_map) {
 	}
 
 
-	for (let i = 0; i < 3*grid_width; ++i) {
+	for (let i = 0; i < 3*grid_height; ++i) {
 		let line = ""
-		for (let j = 0; j < 3*grid_height; ++j) {
+		for (let j = 0; j < 3*grid_width; ++j) {
 			line += drawMap[i][j]
-			values.push(drawMap[i][j])
+			values.push(drawMap[j][i])
 		}
 		console.log(line)
 	}
