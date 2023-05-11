@@ -75,22 +75,19 @@ function check_converged(candidates) {
 
 function compute_candidates(tileset, map, candidates, x, y) {
 	let result = []
-	if (candidates[x][y].length === 0) {
-		return result
-	}
 	for (let i = 0; i < tileset.length; ++i) {
 		let candidate = tileset[i]
 		let valid = true
-		if (x > 0 && candidates[x - 1][y].length === 0 && !check_left(candidate, map[x - 1][y])) {
+		if (x > 0 && map[x - 1][y].length > 0 && !check_left(candidate, map[x - 1][y])) {
 			valid = false
 		}
-		if (x < map.length - 1 && candidates[x + 1][y].length === 0 && !check_right(candidate, map[x + 1][y])) {
+		if (x < map.length - 1 && map[x + 1][y].length > 0 && !check_right(candidate, map[x + 1][y])) {
 			valid = false
 		}
-		if (y > 0 && candidates[x][y - 1].length === 0 && !check_top(candidate, map[x][y - 1])) {
+		if (y > 0 &&  map[x][y - 1].length > 0 && !check_top(candidate, map[x][y - 1])) {
 			valid = false
 		}
-		if (y < map[0].length - 1 && candidates[x][y + 1].length === 0 && !check_bottom(candidate, map[x][y + 1])) {
+		if (y < map[0].length - 1 && map[x][y + 1].length > 0 && !check_bottom(candidate, map[x][y + 1])) {
 			valid = false
 		}
 
@@ -104,8 +101,8 @@ function compute_candidates(tileset, map, candidates, x, y) {
 }
 
 function wfc_build_mesh(height_map) {
-	let grid_width = 5 // height_map.width
-	let grid_height = 5 // height_map.height
+	let grid_width = 10 // height_map.width
+	let grid_height = 10 // height_map.height
 
 	const WATER_LEVEL = -0.03125
 
@@ -144,17 +141,37 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[0, 2, 0], [2, 2, 0], [0, 2, 0]]) // top left bottom
 	tileset.push([[0, 2, 0], [2, 2, 2], [0, 0, 0]]) // top left right
 	tileset.push([[0, 0, 0], [2, 2, 2], [0, 2, 0]]) // bottom left right*/
-	tileset.push([[0, 0, 0], [1, 1, 1], [1, 1, 1]])
+
 	tileset.push([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
+	tileset.push([[0, 0, 0], [1, 1, 1], [1, 1, 1]])
 	tileset.push([[1, 1, 1], [1, 1, 1], [0, 0, 0]])
 	tileset.push([[0, 1, 1], [0, 1, 1], [0, 1, 1]])
 	tileset.push([[1, 1, 0], [1, 1, 0], [1, 1, 0]])
+
+	tileset.push([[0, 0, 0], [0, 1, 1], [0, 1, 1]])
+	tileset.push([[0, 0, 0], [1, 1, 0], [1, 1, 0]])
+	tileset.push([[0, 1, 1], [0, 1, 1], [0, 0, 0]])
+	tileset.push([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
 
 	tileset.push([[2, 2, 2], [2, 2, 2], [2, 2, 2]])
 	tileset.push([[0, 0, 0], [2, 2, 2], [2, 2, 2]])
 	tileset.push([[2, 2, 2], [2, 2, 2], [0, 0, 0]])
 	tileset.push([[0, 2, 2], [0, 2, 2], [0, 2, 2]])
 	tileset.push([[2, 2, 0], [2, 2, 0], [2, 2, 0]])
+
+	tileset.push([[0, 0, 0], [0, 2, 2], [0, 2, 2]])
+	tileset.push([[0, 0, 0], [2, 2, 0], [2, 2, 0]])
+	tileset.push([[0, 2, 2], [0, 2, 2], [0, 0, 0]])
+	tileset.push([[2, 2, 0], [2, 2, 0], [0, 0, 0]])
+
+	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]])
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]])
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]])
+	tileset.push([[0, 0, 0], [2, 2, 2], [2, 3, 2]])
+	tileset.push([[2, 3, 2], [2, 2, 2], [0, 0, 0]])
+	tileset.push([[0, 2, 2], [0, 2, 3], [0, 2, 2]])
+	tileset.push([[2, 2, 0], [3, 2, 0], [2, 2, 0]])
+
 
 	
 
@@ -168,27 +185,49 @@ function wfc_build_mesh(height_map) {
 	let y = Math.floor(Math.random() * grid_height)
 
 
+
 	// console.log(x, y)
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			// if (i === x && j === y) {
-			// 	map[i][j] = tileset[1]
+			if (i === 0 && j === 0) {
+				map[i][j] = tileset[1]
+			}
+			else if (i === 9 && j === 9) {
+				map[i][j] = tileset[7]
+			}
+			// else if (i === 9 && j === 9) {
+			// 	map[i][j] = tileset[7]
+			// }
+			else {
+				map[i][j] = []
+			}
+			
+			// map[i][j] = tileset[0]
+			// candidates[i][j] = tileset
+		}
+	}
+
+	for (let i = 0; i < grid_width; ++i) {
+		for (let j = 0; j < grid_height; ++j) {
+			if (i === 0 && j === 0) {
+				candidates[i][j] = []
+			}
+			else if (i === 9 && j === 9) {
+				candidates[i][j] = []
+			}
+			// else if (i === 9 && j === 9) {
 			// 	candidates[i][j] = []
 			// }
-			// else {
-			// 	map[i][j] = []
-			// 	candidates[i][j] = tileset
-			// }
-			
-			map[i][j] = tileset[0]
-			candidates[i][j] = tileset
+			else {
+				candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
+			}
 		}
 	}
 
 	let count = 0
 	while (!check_converged(candidates)) {
-		if (count > 100) {
+		if (count >= 150) {
 			console.log("failed")
 			break
 		}
@@ -197,7 +236,7 @@ function wfc_build_mesh(height_map) {
 
 		for (let i = 0; i < grid_width; ++i) {
 			for (let j = 0; j < grid_height; ++j) {
-				if (candidates[i][j] > 0) {
+				if (candidates[i][j].length > 0) {
 					candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
 				}
 			}
@@ -228,6 +267,16 @@ function wfc_build_mesh(height_map) {
 
 		}
 
+	}
+
+
+
+	for (let i = 0; i < grid_width; ++i) {
+		for (let j = 0; j < grid_height; ++j) {
+			if (map[i][j].length === 0) {
+				map[i][j] = [[4, 4, 4], [4, 4, 4], [4, 4, 4]]
+			}
+		}
 	}
 
 	// console.log("done")
@@ -324,12 +373,21 @@ function wfc_build_mesh(height_map) {
 				normals[idx] = [0, 0, 1];
 			}
 
+			if (gx > 0 && drawMap[gx - 1][gy] === 0) {
+				z = WATER_LEVEL;
+			}
+			if (gy > 0 && drawMap[gx][gy - 1] === 0) {
+				z = WATER_LEVEL;
+			}
+
 			//vertices[idx] = [gx, gy, z];
 			//if(drawMap[gx][gy] !== 0) {
 				vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
+				// vertices[idx] = [gx, gy, z];
 			//}
 		}
 	}
+
 
 	for(let gy = 0; gy < grid_height - 1; gy++) {
 		for(let gx = 0; gx < grid_width - 1; gx++) {
