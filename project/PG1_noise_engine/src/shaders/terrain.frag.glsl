@@ -15,6 +15,12 @@ const vec3  terrain_color_water    = vec3(0.29, 0.51, 0.62);
 const vec3  terrain_color_mountain = vec3(0.8, 0.5, 0.4);
 const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
+// varying float value;
+
+uniform int values[900];
+
+varying vec3 pos_out;
+
 void main()
 {
 	const vec3 ambient = 0.2 * light_color; // Ambient light intensity
@@ -34,14 +40,61 @@ void main()
 	vec3 material_color = terrain_color_grass; // Initial value
 	float shininess = 0.5;
 
-	if(height < terrain_water_level){
+	
+    float x = pos_out.x + 0.5;
+    x *= 30.0;
+    float y = pos_out.y + 0.5;
+    y *= 30.0;
+
+    // // float test = floor(x) + float(15) * floor(y);
+    // float test = floor(position.x) + float(15) * floor(position.y);
+
+    // value = float(values[int(test)]);
+
+	int test = int(floor(x) + float(30) * floor(y));
+
+	float value = 0.0;
+
+	for (int x = 0; x < 900; x++) {
+		if (x == test) {
+			value = float(values[x]);
+		}
+	}
+
+
+
+
+
+	// if(height < terrain_water_level){
+	if (int(value) == 0) {
 		material_color = terrain_color_water;
 		shininess = 30.;
 	}
-	else{
-		material_color = mix(terrain_color_grass, terrain_color_mountain, (height - terrain_water_level)*2.);
+	else if (int(value) == 2) {
+		material_color = terrain_color_grass;
 		shininess = 2.;
 	}
+	else if (int(value) == 1) {
+		// material_color = mix(terrain_color_grass, terrain_color_mountain, (height - terrain_water_level)*2.);
+		material_color = terrain_color_mountain;
+		shininess = 2.;
+	}
+	else if (int(value) == 3) {
+		// material_color = mix(terrain_color_grass, terrain_color_mountain, (height - terrain_water_level)*2.);
+		material_color = vec3(0.2, 0.2, 0.2);
+		shininess = 2.;
+	}
+	else {
+		material_color = vec3(0.0, 0.0, 0.0);
+	}
+
+
+	if (pos_out.x == floor(pos_out.x) && pos_out.y == floor(pos_out.y)) {
+		material_color = vec3(1.0, 0.0, 0.0);
+	}
+
+	// material_color = vec3()
+
 
 	/* #TODO PG1.6.1: apply the Blinn-Phong lighting model
     	Implement the Phong shading model by using the passed variables and write the resulting color to `color`.

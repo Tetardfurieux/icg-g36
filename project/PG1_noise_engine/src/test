@@ -1,0 +1,16 @@
+tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
+	tileset.push([[0, 2, 0], [2, 2, 2], [0, 2, 0]]) // full
+	tileset.push([[0, 0, 0], [0, 2, 2], [0, 0, 0]]) // right
+	tileset.push([[0, 0, 0], [2, 2, 0], [0, 0, 0]]) // left
+	tileset.push([[0, 2, 0], [0, 2, 0], [0, 0, 0]]) // top
+	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 0]]) // bottom
+	tileset.push([[0, 2, 0], [0, 2, 2], [0, 0, 0]]) // top right
+	tileset.push([[0, 2, 0], [2, 2, 0], [0, 0, 0]]) // top left
+	tileset.push([[0, 0, 0], [2, 2, 0], [0, 2, 0]]) // bottom left
+	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 2]]) // bottom right
+	tileset.push([[0, 2, 0], [0, 2, 0], [0, 2, 0]]) // top bottom
+	tileset.push([[0, 0, 0], [2, 2, 2], [0, 0, 0]]) // left right
+	tileset.push([[0, 2, 0], [0, 2, 2], [0, 2, 0]]) // top right bottom
+	tileset.push([[0, 2, 0], [2, 2, 0], [0, 2, 0]]) // top left bottom
+	tileset.push([[0, 2, 0], [2, 2, 2], [0, 0, 0]]) // top left right
+	tileset.push([[0, 0, 0], [2, 2, 2], [0, 2, 0]]) // bottom left right
