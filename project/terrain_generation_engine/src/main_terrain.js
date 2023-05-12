@@ -166,6 +166,8 @@ async function main() {
 		update_needed = true
 	})
 
+
+
 	/*---------------------------------------------------------------
 		Actors
 	---------------------------------------------------------------*/
@@ -181,9 +183,85 @@ async function main() {
 		}
 	})()
 
-	texture_fbm.draw_texture_to_buffer({width: 96, height: 96, mouse_offset: [-12.24, 8.15]})
 
-	const terrain_actor = init_terrain(regl, resources, texture_fbm.get_buffer())
+	const map_width = 10;
+	const map_height = 10;
+	texture_fbm.draw_texture_to_buffer({width: map_width, height: map_height, mouse_offset: [-12.24, 8.15]})
+
+	const init_terrain_response = init_terrain(regl, resources, texture_fbm.get_buffer())
+	const terrain_actor = init_terrain_response.terrain_actor;
+	const terrain_map = init_terrain_response.terrain_map; 
+
+	/*---------------------------------------------------------------
+		Minimap
+	---------------------------------------------------------------*/
+	const map = document.getElementById('minimap');
+	var isMinimapVisible = true;
+	document.addEventListener('keypress', (event) => {
+		if (event.key === 'm') {
+			if(isMinimapVisible){
+				map.style.display = "none";
+			}else{
+				map.style.display = "block";
+			}
+			isMinimapVisible = !isMinimapVisible;
+		}
+	});
+
+	const minimap = document.getElementById('map_visual');
+	minimap.addEventListener('click', (event) => {
+		alert("map editor mode not implemented yet");
+	});
+	const drawingContext = minimap.getContext("2d");
+	
+	const map_DIM = 300;
+	minimap.width = map_DIM;
+	minimap.height = map_DIM;
+
+	const roadColor = "rgb(127, 100, 100)";
+	const waterColor = "rgb(79, 202, 227)";
+	const grassColor = "rgb(154, 217, 138)";
+	const mountainColor = "rgb(231, 217, 195)";
+
+	const DIM_CELL = (map_DIM/map_width)/3;
+			
+	for(let i = 0; i < map_width * 3; i++){
+		for(let j = 0; j < map_height * 3; j++){
+			var cell = terrain_map[i][j];
+			switch(cell){
+				case 0:
+					drawingContext.fillStyle = waterColor;
+					break;
+				case 1:
+					drawingContext.fillStyle = mountainColor;
+					break;
+				case 2:
+					drawingContext.fillStyle = grassColor;
+					break;
+				case 3 :
+					drawingContext.fillStyle = "red";
+					break;
+				default :
+					break;
+				}
+				drawingContext.fillRect((map_width*3-1-i)*DIM_CELL,j*DIM_CELL,DIM_CELL,DIM_CELL);
+			}	
+		}
+	
+	/*
+	for(let i =0; i < map.width; i++){
+		for(let j = 0; j < map.height; j++){
+			let x = i * DIM_CELL;
+			let y = j * DIM_CELL;
+			
+			drawingContext.startPath();
+			drawingContext.fillStyle = "rgb(0, 255, 255)";
+			drawingContext.fillRect(x, y, DIM_CELL, DIM_CELL);
+			drawingContext.endPath();
+		}
+	}
+	*/
+
 
 	/*
 		UI

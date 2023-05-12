@@ -1,0 +1,39 @@
+/*
+    This file contains the css code for the minimap
+*/
+#minimap
+{
+    z-index : 2;
+    position : fixed; 
+    top : 10px;
+    right : 10px;
+    
+    width : fit-content;
+    height: fit-content;
+
+    color : white;
+    background-color: rgb(114, 114, 127);
+    border : 3px solid rgb(17, 17, 17);
+    border-radius: 10px;
+    padding : 10px;
+
+    cursor : move;
+}
+
+#minimap p
+{
+    color : white;
+    text-align: center;
+    margin : 0px;
+    margin-bottom: 5px;
+}
+
+#map_visual
+{
+    width : 300px;
+    height : 300px;
+
+    border : 3px solid rgb(17, 17, 17);
+    background-color: white;
+    cursor : pointer;
+}
