@@ -1,3 +1,4 @@
+
 import {mat3, mat4, vec3} from "../lib/gl-matrix_3.3.0/esm/index.js"
 import {mat4_matmul_many} from "./icg_math.js"
 
@@ -108,79 +109,57 @@ function wfc_build_mesh(height_map) {
 
 	// let map be an array of 3x3 arrays of ints
 	let tileset = []
-	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
 
-	tileset.push([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
-	tileset.push([[0, 0, 0], [1, 1, 1], [1, 1, 1]])
-	tileset.push([[1, 1, 1], [1, 1, 1], [0, 0, 0]])
-	tileset.push([[0, 1, 1], [0, 1, 1], [0, 1, 1]])
-	tileset.push([[1, 1, 0], [1, 1, 0], [1, 1, 0]])
+	// FULL
+	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // 0
+	tileset.push([[2, 2, 2], [2, 2, 2], [2, 2, 2]]) // 1
 
-	tileset.push([[0, 0, 0], [0, 1, 1], [0, 1, 1]])
-	tileset.push([[0, 0, 0], [1, 1, 0], [1, 1, 0]])
-	tileset.push([[0, 1, 1], [0, 1, 1], [0, 0, 0]])
-	tileset.push([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
+	// LINE TRANSITIONS
+	tileset.push([[0, 0, 0], [1, 1, 1], [2, 2, 2]]) // 2
+	tileset.push([[2, 2, 2], [1, 1, 1], [0, 0, 0]])	// 3
+	tileset.push([[0, 1, 2], [0, 1, 2], [0, 1, 2]])	// 4
+	tileset.push([[2, 1, 0], [2, 1, 0], [2, 1, 0]])	// 5
 
-	tileset.push([[2, 2, 2], [2, 2, 2], [2, 2, 2]])
-	tileset.push([[0, 0, 0], [2, 2, 2], [2, 2, 2]])
-	tileset.push([[2, 2, 2], [2, 2, 2], [0, 0, 0]])
-	tileset.push([[0, 2, 2], [0, 2, 2], [0, 2, 2]])
-	tileset.push([[2, 2, 0], [2, 2, 0], [2, 2, 0]])
+	// CORNER TRANSITIONS CONVEX
+	tileset.push([[0, 0, 0], [0, 1, 1], [0, 1, 2]]) // 6
+	tileset.push([[0, 0, 0], [1, 1, 0], [2, 1, 0]]) // 7
+	tileset.push([[0, 1, 2], [0, 1, 1], [0, 0, 0]]) // 8
+	tileset.push([[2, 1, 0], [1, 1, 0], [0, 0, 0]]) // 9
 
-	tileset.push([[0, 0, 0], [0, 2, 2], [0, 2, 2]])
-	tileset.push([[0, 0, 0], [2, 2, 0], [2, 2, 0]])
-	tileset.push([[0, 2, 2], [0, 2, 2], [0, 0, 0]])
-	tileset.push([[2, 2, 0], [2, 2, 0], [0, 0, 0]])
+	tileset.push([[2, 2, 2], [2, 1, 1], [2, 1, 0]]) // 6
+	tileset.push([[2, 2, 2], [1, 1, 2], [0, 1, 2]]) // 7
+	tileset.push([[2, 1, 0], [2, 1, 1], [2, 2, 2]]) // 8
+	tileset.push([[0, 1, 2], [1, 1, 2], [2, 2, 2]]) // 9
 
-	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]]) //TODO update list
-	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]])
-	tileset.push([[2, 2, 2], [3, 3, 3], [2, 2, 2]])
-	tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]])
-	tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]])
-	tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]])
-	tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]])
-	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]])
-	tileset.push([[2, 2, 2], [2, 3, 2], [2, 3, 2]])
-	tileset.push([[2, 2, 2], [2, 3, 3], [2, 2, 2]])
-	tileset.push([[2, 2, 2], [3, 3, 2], [2, 2, 2]])
+	// ROADS
+	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]]) // 10
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]]) // 11
+	tileset.push([[2, 2, 2], [3, 3, 3], [2, 2, 2]]) // 12
+	// tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]])	// 21
+	// tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]])	// 22
+	// tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]]) // 23
+	// tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]]) // 24
 
+	// ROAD ENDS
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]]) // 13
+	tileset.push([[2, 2, 2], [2, 3, 2], [2, 3, 2]]) // 14
+	tileset.push([[2, 2, 2], [2, 3, 3], [2, 2, 2]]) // 15
+	tileset.push([[2, 2, 2], [3, 3, 2], [2, 2, 2]]) // 16
 
-	let adjacencies = Array.from(Array(grid_width), () => new Array(grid_height))
-
-	adjacencies[0] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[1] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[2] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[3] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[4] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[5] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[6] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[7] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[8] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[9] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-
-	adjacencies[10] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[11] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[12] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[13] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[14] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[15] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[16] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[17] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[18] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[19] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-
-	adjacencies[20] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[21] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[22] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[23] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[24] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[25] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[26] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[27] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[28] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-	adjacencies[29] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	// ROAD TURNS
+	tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]]) // 17
+	tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]]) // 18
+	tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]]) // 19
+	tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]]) // 20
 
 
+
+
+	let adjacencies = []
+
+	for (let i = 0; i < tileset.length; ++i) {
+		adjacencies.push([10, 100, 1, 1, 1, 1, 1, 1, 1, 1, /*10*/  1, 1, 1, 1, 5, 5, 5, 5, 5, 5, /*20*/ 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+	}
 
 
 	let candidates = Array.from(Array(grid_width), () => new Array(grid_height))
@@ -196,19 +175,16 @@ function wfc_build_mesh(height_map) {
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			if (i === 0 && j === 0) {
-				map[i][j] = [1]
-			}
-			else if (i === 19 && j === 19) {
+			if (i === 10 && j === 10) {
 				map[i][j] = [7]
 			}
-			// else if (i === 9 && j === 9) {
-			// 	map[i][j] = tileset[7]
-			// }
+			//else if (i === 11 && j === 10) {
+			//	map[i][j] = [19]
+			//}
 			else {
 				map[i][j] = []
 			}
-			
+
 			// map[i][j] = tileset[0]
 			// candidates[i][j] = tileset
 		}
@@ -216,15 +192,9 @@ function wfc_build_mesh(height_map) {
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			if (i === 0 && j === 0) {
+			if (i === 10 && j === 10) {
 				candidates[i][j] = []
 			}
-			else if (i === 19 && j === 19) {
-				candidates[i][j] = []
-			}
-			// else if (i === 9 && j === 9) {
-			// 	candidates[i][j] = []
-			// }
 			else {
 				candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
 			}
@@ -233,7 +203,7 @@ function wfc_build_mesh(height_map) {
 
 	let count = 0
 	while (!check_converged(candidates)) {
-		if (count >= 450) {
+		if (count >= 500) {
 			console.log("failed")
 			break
 		}
@@ -253,30 +223,55 @@ function wfc_build_mesh(height_map) {
 				break
 			}
 			for (let i = 0; i < grid_width; ++i) {
-				if (foundMin) { //TODO
+				if (foundMin) {
 					break
 				}
 				for (let j = 0; j < grid_height; ++j) {
 					// console.log(candidates[i][j].length)
 					if (candidates[i][j].length === k) {
 						let r = Math.floor(Math.random() * candidates[i][j].length)
+
+						console.log("------------------")
+						console.log(candidates[i][j], i, j)
+
 						let neighbors = []
+						if (i > 0 && map[i - 1][j].length > 0) {
+							neighbors.push(map[i - 1][j][0])
+						}
+						if (i < grid_width - 1 && map[i + 1][j].length > 0) {
+							neighbors.push(map[i + 1][j][0])
+						}
+						if (j > 0 && map[i][j - 1].length > 0) {
+							neighbors.push(map[i][j - 1][0])
+						}
+						if (j < grid_height - 1 && map[i][j + 1].length > 0) {
+							neighbors.push(map[i][j + 1][0])
+						}
 
-						
-						let choices = []
-						// for (let l = 0; l < candidates[i][j].length; ++l) {
-						// 	for (let m = 0; m < adjacencies[candidates[i][j]].length; ++m) {
-						// 		if (adjacencies[candidates[i][j][l]][m] === 1) {
-						// 			choices.push(candidates[i][j][l])
-						// 			break
-						// 		}
-						// 	}
-						// }
+						// map the candidates to their adjacencies
+						let scores = []
+						for (let c = 0; c < candidates[i][j].length; ++c) {
+							let score = 0
+							for (let n = 0; n < neighbors.length; ++n) {
+								score += adjacencies[neighbors[n]][candidates[i][j][c]]
+							}
+							scores.push(score)
+						}
 
-						// console.log(i, j, r)
-						// console.log(candidates[i][j][r])
-						map[i][j] = [candidates[i][j][r]]
-						// console.log(map)
+
+						// select the candidates with the highest score
+						let weighted_candidates = []
+						for (let c = 0; c < candidates[i][j].length; ++c) {
+							for (let s = 0; s < scores[c]; ++s) {
+								weighted_candidates.push(candidates[i][j][c])
+							}
+						}
+
+						console.log(weighted_candidates)
+
+						r = Math.floor(Math.random() * weighted_candidates.length)
+
+						map[i][j] = [weighted_candidates[r]]
 						candidates[i][j] = []
 						foundMin = true
 						break
@@ -403,8 +398,8 @@ function wfc_build_mesh(height_map) {
 
 			//vertices[idx] = [gx, gy, z];
 			//if(drawMap[gx][gy] !== 0) {
-				vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
-				// vertices[idx] = [gx, gy, z];
+			vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
+			// vertices[idx] = [gx, gy, z];
 			//}
 		}
 	}
@@ -472,23 +467,23 @@ export function init_terrain(regl, resources, height_map_buffer) {
 		draw({mat_projection, mat_view, light_position_cam}) {
 			mat4_matmul_many(this.mat_model_view, mat_view, this.mat_model_to_world)
 			mat4_matmul_many(this.mat_mvp, mat_projection, this.mat_model_view)
-	
+
 			mat3.fromMat4(this.mat_normals, this.mat_model_view)
 			mat3.transpose(this.mat_normals, this.mat_normals)
 			mat3.invert(this.mat_normals, this.mat_normals)
-	
+
 			pipeline_draw_terrain({
 				mat_mvp: this.mat_mvp,
 				mat_model_view: this.mat_model_view,
 				mat_normals: this.mat_normals,
-		
+
 				light_position: light_position_cam,
 			})
 		}
 	}
 
 	return {
-		terrain_actor : new TerrainActor(), 
+		terrain_actor : new TerrainActor(),
 		terrain_map : terrain_mesh.map
 	};
 }

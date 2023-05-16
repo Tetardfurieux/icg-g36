@@ -89,9 +89,15 @@ void main()
 	}
 
 
-	if (pos_out.x == floor(pos_out.x) && pos_out.y == floor(pos_out.y)) {
+
+	/*
+	if (pos_out.x <= -0.4) {
 		material_color = vec3(1.0, 0.0, 0.0);
 	}
+	if (pos_out.y <= -0.4) {
+		material_color = vec3(0.0, 1.0, 0.0);
+	}
+	*/
 
 	// material_color = vec3()
 
