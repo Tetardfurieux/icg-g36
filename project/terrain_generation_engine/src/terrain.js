@@ -78,21 +78,21 @@ function compute_candidates(tileset, map, candidates, x, y) {
 	for (let i = 0; i < tileset.length; ++i) {
 		let candidate = tileset[i]
 		let valid = true
-		if (x > 0 && map[x - 1][y].length > 0 && !check_left(candidate, map[x - 1][y])) {
+		if (x > 0 && map[x - 1][y].length > 0 && !check_left(candidate, tileset[map[x - 1][y]])) {
 			valid = false
 		}
-		if (x < map.length - 1 && map[x + 1][y].length > 0 && !check_right(candidate, map[x + 1][y])) {
+		if (x < map.length - 1 && map[x + 1][y].length > 0 && !check_right(candidate, tileset[map[x + 1][y]])) {
 			valid = false
 		}
-		if (y > 0 &&  map[x][y - 1].length > 0 && !check_top(candidate, map[x][y - 1])) {
+		if (y > 0 &&  map[x][y - 1].length > 0 && !check_top(candidate, tileset[map[x][y - 1]])) {
 			valid = false
 		}
-		if (y < map[0].length - 1 && map[x][y + 1].length > 0 && !check_bottom(candidate, map[x][y + 1])) {
+		if (y < map[0].length - 1 && map[x][y + 1].length > 0 && !check_bottom(candidate, tileset[map[x][y + 1]])) {
 			valid = false
 		}
 
 		if (valid) {
-			result.push(candidate)
+			result.push(i)
 		}
 
 	}
@@ -101,46 +101,14 @@ function compute_candidates(tileset, map, candidates, x, y) {
 }
 
 function wfc_build_mesh(height_map) {
-	let grid_width = 10 // height_map.width
-	let grid_height = 10 // height_map.height
+	let grid_width = 20 // height_map.width
+	let grid_height = 20 // height_map.height
 
 	const WATER_LEVEL = -0.03125
 
 	// let map be an array of 3x3 arrays of ints
 	let tileset = []
 	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
-	/*tileset.push([[0, 1, 0], [1, 1, 1], [0, 1, 0]]) // full
-	tileset.push([[0, 0, 0], [0, 1, 1], [0, 0, 0]]) // right
-	tileset.push([[0, 0, 0], [1, 1, 0], [0, 0, 0]]) // left
-	tileset.push([[0, 1, 0], [0, 1, 0], [0, 0, 0]]) // top
-	tileset.push([[0, 0, 0], [0, 1, 0], [0, 1, 0]]) // bottom
-	tileset.push([[0, 1, 0], [0, 1, 1], [0, 0, 0]]) // top right
-	tileset.push([[0, 1, 0], [1, 1, 0], [0, 0, 0]]) // top left
-	tileset.push([[0, 0, 0], [1, 1, 0], [0, 1, 0]]) // bottom left
-	tileset.push([[0, 0, 0], [0, 1, 0], [0, 1, 1]]) // bottom right
-	tileset.push([[0, 1, 0], [0, 1, 0], [0, 1, 0]]) // top bottom
-	tileset.push([[0, 0, 0], [1, 1, 1], [0, 0, 0]]) // left right
-	tileset.push([[0, 1, 0], [0, 1, 1], [0, 1, 0]]) // top right bottom
-	tileset.push([[0, 1, 0], [1, 1, 0], [0, 1, 0]]) // top left bottom
-	tileset.push([[0, 1, 0], [1, 1, 1], [0, 0, 0]]) // top left right
-	tileset.push([[0, 0, 0], [1, 1, 1], [0, 1, 0]]) // bottom left right
-
-	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
-	tileset.push([[0, 2, 0], [2, 2, 2], [0, 2, 0]]) // full
-	tileset.push([[0, 0, 0], [0, 2, 2], [0, 0, 0]]) // right
-	tileset.push([[0, 0, 0], [2, 2, 0], [0, 0, 0]]) // left
-	tileset.push([[0, 2, 0], [0, 2, 0], [0, 0, 0]]) // top
-	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 0]]) // bottom
-	tileset.push([[0, 2, 0], [0, 2, 2], [0, 0, 0]]) // top right
-	tileset.push([[0, 2, 0], [2, 2, 0], [0, 0, 0]]) // top left
-	tileset.push([[0, 0, 0], [2, 2, 0], [0, 2, 0]]) // bottom left
-	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 2]]) // bottom right
-	tileset.push([[0, 2, 0], [0, 2, 0], [0, 2, 0]]) // top bottom
-	tileset.push([[0, 0, 0], [2, 2, 2], [0, 0, 0]]) // left right
-	tileset.push([[0, 2, 0], [0, 2, 2], [0, 2, 0]]) // top right bottom
-	tileset.push([[0, 2, 0], [2, 2, 0], [0, 2, 0]]) // top left bottom
-	tileset.push([[0, 2, 0], [2, 2, 2], [0, 0, 0]]) // top left right
-	tileset.push([[0, 0, 0], [2, 2, 2], [0, 2, 0]]) // bottom left right*/
 
 	tileset.push([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
 	tileset.push([[0, 0, 0], [1, 1, 1], [1, 1, 1]])
@@ -164,16 +132,54 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[0, 2, 2], [0, 2, 2], [0, 0, 0]])
 	tileset.push([[2, 2, 0], [2, 2, 0], [0, 0, 0]])
 
-	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]])
+	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]]) //TODO update list
 	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]])
+	tileset.push([[2, 2, 2], [3, 3, 3], [2, 2, 2]])
+	tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]])
+	tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]])
+	tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]])
+	tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]])
 	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]])
-	tileset.push([[0, 0, 0], [2, 2, 2], [2, 3, 2]])
-	tileset.push([[2, 3, 2], [2, 2, 2], [0, 0, 0]])
-	tileset.push([[0, 2, 2], [0, 2, 3], [0, 2, 2]])
-	tileset.push([[2, 2, 0], [3, 2, 0], [2, 2, 0]])
+	tileset.push([[2, 2, 2], [2, 3, 2], [2, 3, 2]])
+	tileset.push([[2, 2, 2], [2, 3, 3], [2, 2, 2]])
+	tileset.push([[2, 2, 2], [3, 3, 2], [2, 2, 2]])
 
 
-	
+	let adjacencies = Array.from(Array(grid_width), () => new Array(grid_height))
+
+	adjacencies[0] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[1] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[2] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[3] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[4] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[5] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[6] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[7] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[8] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[9] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+	adjacencies[10] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[11] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[12] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[13] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[14] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[15] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[16] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[17] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[18] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[19] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+	adjacencies[20] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[21] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[22] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[23] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[24] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[25] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[26] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[27] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[28] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	adjacencies[29] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
 
 
 
@@ -191,10 +197,10 @@ function wfc_build_mesh(height_map) {
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
 			if (i === 0 && j === 0) {
-				map[i][j] = tileset[1]
+				map[i][j] = [1]
 			}
-			else if (i === 9 && j === 9) {
-				map[i][j] = tileset[7]
+			else if (i === 19 && j === 19) {
+				map[i][j] = [7]
 			}
 			// else if (i === 9 && j === 9) {
 			// 	map[i][j] = tileset[7]
@@ -213,7 +219,7 @@ function wfc_build_mesh(height_map) {
 			if (i === 0 && j === 0) {
 				candidates[i][j] = []
 			}
-			else if (i === 9 && j === 9) {
+			else if (i === 19 && j === 19) {
 				candidates[i][j] = []
 			}
 			// else if (i === 9 && j === 9) {
@@ -227,7 +233,7 @@ function wfc_build_mesh(height_map) {
 
 	let count = 0
 	while (!check_converged(candidates)) {
-		if (count >= 150) {
+		if (count >= 450) {
 			console.log("failed")
 			break
 		}
@@ -254,9 +260,22 @@ function wfc_build_mesh(height_map) {
 					// console.log(candidates[i][j].length)
 					if (candidates[i][j].length === k) {
 						let r = Math.floor(Math.random() * candidates[i][j].length)
+						let neighbors = []
+
+						
+						let choices = []
+						// for (let l = 0; l < candidates[i][j].length; ++l) {
+						// 	for (let m = 0; m < adjacencies[candidates[i][j]].length; ++m) {
+						// 		if (adjacencies[candidates[i][j][l]][m] === 1) {
+						// 			choices.push(candidates[i][j][l])
+						// 			break
+						// 		}
+						// 	}
+						// }
+
 						// console.log(i, j, r)
 						// console.log(candidates[i][j][r])
-						map[i][j] = candidates[i][j][r]
+						map[i][j] = [candidates[i][j][r]]
 						// console.log(map)
 						candidates[i][j] = []
 						foundMin = true
@@ -269,15 +288,17 @@ function wfc_build_mesh(height_map) {
 
 	}
 
-
-
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
 			if (map[i][j].length === 0) {
 				map[i][j] = [[4, 4, 4], [4, 4, 4], [4, 4, 4]]
 			}
+			else {
+				map[i][j] = tileset[map[i][j]]
+			}
 		}
 	}
+
 
 	// console.log("done")
 

@@ -17,7 +17,7 @@ const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
 // varying float value;
 
-uniform int values[900];
+uniform int values[3600];
 
 varying vec3 pos_out;
 
@@ -42,20 +42,20 @@ void main()
 
 	
     float x = pos_out.x + 0.5;
-    x *= 30.0;
+    x *= 60.0;
     float y = pos_out.y + 0.5;
-    y *= 30.0;
+    y *= 60.0;
 
     // // float test = floor(x) + float(15) * floor(y);
     // float test = floor(position.x) + float(15) * floor(position.y);
 
     // value = float(values[int(test)]);
 
-	int test = int(floor(x) + float(30) * floor(y));
+	int test = int(floor(x) + float(60) * floor(y));
 
 	float value = 0.0;
 
-	for (int x = 0; x < 900; x++) {
+	for (int x = 0; x < 3600; x++) {
 		if (x == test) {
 			value = float(values[x]);
 		}

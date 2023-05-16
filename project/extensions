@@ -1,0 +1,19 @@
+Use the 2D variant of the wave function collapse to generate the city (or the terrain) procedurally.
+
+
+Have at least four sets of types of tiles that can be combined in this algorithm (grass, tree, sand, water) and their respective adjacency probabilities (ex, can’t have a tree tile next to a sand tile, or no grass next to the water, or 50/50 to have sand or tree next to grass).
+Extensions (clamped to 5.5)
+
+[+1] Extend the wave function collapse algorithm to work in 3D -> blocks can now be added vertically
+
+[+0.5] Add more tiles (at least 4)
+
+[+1] Generate textures using wave collapse
+
+[+1] Interactive generation (ex. Clicking to add or remove tiles)
+
+[+0.5] Online generation of an infinite scene as the camera is scrolling
+
+[+0.5] Day-night cycle
+
+[+0.5] Animations
