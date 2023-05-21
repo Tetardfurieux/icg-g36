@@ -1,3 +1,4 @@
+
 import {mat3, mat4, vec3} from "../lib/gl-matrix_3.3.0/esm/index.js"
 import {mat4_matmul_many} from "./icg_math.js"
 
@@ -78,21 +79,21 @@ function compute_candidates(tileset, map, candidates, x, y) {
 	for (let i = 0; i < tileset.length; ++i) {
 		let candidate = tileset[i]
 		let valid = true
-		if (x > 0 && map[x - 1][y].length > 0 && !check_left(candidate, map[x - 1][y])) {
+		if (x > 0 && map[x - 1][y].length > 0 && !check_left(candidate, tileset[map[x - 1][y]])) {
 			valid = false
 		}
-		if (x < map.length - 1 && map[x + 1][y].length > 0 && !check_right(candidate, map[x + 1][y])) {
+		if (x < map.length - 1 && map[x + 1][y].length > 0 && !check_right(candidate, tileset[map[x + 1][y]])) {
 			valid = false
 		}
-		if (y > 0 &&  map[x][y - 1].length > 0 && !check_top(candidate, map[x][y - 1])) {
+		if (y > 0 &&  map[x][y - 1].length > 0 && !check_top(candidate, tileset[map[x][y - 1]])) {
 			valid = false
 		}
-		if (y < map[0].length - 1 && map[x][y + 1].length > 0 && !check_bottom(candidate, map[x][y + 1])) {
+		if (y < map[0].length - 1 && map[x][y + 1].length > 0 && !check_bottom(candidate, tileset[map[x][y + 1]])) {
 			valid = false
 		}
 
 		if (valid) {
-			result.push(candidate)
+			result.push(i)
 		}
 
 	}
@@ -101,80 +102,64 @@ function compute_candidates(tileset, map, candidates, x, y) {
 }
 
 function wfc_build_mesh(height_map) {
-	let grid_width = 10 // height_map.width
-	let grid_height = 10 // height_map.height
+	let grid_width = 20 // height_map.width
+	let grid_height = 20 // height_map.height
 
 	const WATER_LEVEL = -0.03125
 
 	// let map be an array of 3x3 arrays of ints
 	let tileset = []
-	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
-	/*tileset.push([[0, 1, 0], [1, 1, 1], [0, 1, 0]]) // full
-	tileset.push([[0, 0, 0], [0, 1, 1], [0, 0, 0]]) // right
-	tileset.push([[0, 0, 0], [1, 1, 0], [0, 0, 0]]) // left
-	tileset.push([[0, 1, 0], [0, 1, 0], [0, 0, 0]]) // top
-	tileset.push([[0, 0, 0], [0, 1, 0], [0, 1, 0]]) // bottom
-	tileset.push([[0, 1, 0], [0, 1, 1], [0, 0, 0]]) // top right
-	tileset.push([[0, 1, 0], [1, 1, 0], [0, 0, 0]]) // top left
-	tileset.push([[0, 0, 0], [1, 1, 0], [0, 1, 0]]) // bottom left
-	tileset.push([[0, 0, 0], [0, 1, 0], [0, 1, 1]]) // bottom right
-	tileset.push([[0, 1, 0], [0, 1, 0], [0, 1, 0]]) // top bottom
-	tileset.push([[0, 0, 0], [1, 1, 1], [0, 0, 0]]) // left right
-	tileset.push([[0, 1, 0], [0, 1, 1], [0, 1, 0]]) // top right bottom
-	tileset.push([[0, 1, 0], [1, 1, 0], [0, 1, 0]]) // top left bottom
-	tileset.push([[0, 1, 0], [1, 1, 1], [0, 0, 0]]) // top left right
-	tileset.push([[0, 0, 0], [1, 1, 1], [0, 1, 0]]) // bottom left right
 
-	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // empty
-	tileset.push([[0, 2, 0], [2, 2, 2], [0, 2, 0]]) // full
-	tileset.push([[0, 0, 0], [0, 2, 2], [0, 0, 0]]) // right
-	tileset.push([[0, 0, 0], [2, 2, 0], [0, 0, 0]]) // left
-	tileset.push([[0, 2, 0], [0, 2, 0], [0, 0, 0]]) // top
-	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 0]]) // bottom
-	tileset.push([[0, 2, 0], [0, 2, 2], [0, 0, 0]]) // top right
-	tileset.push([[0, 2, 0], [2, 2, 0], [0, 0, 0]]) // top left
-	tileset.push([[0, 0, 0], [2, 2, 0], [0, 2, 0]]) // bottom left
-	tileset.push([[0, 0, 0], [0, 2, 0], [0, 2, 2]]) // bottom right
-	tileset.push([[0, 2, 0], [0, 2, 0], [0, 2, 0]]) // top bottom
-	tileset.push([[0, 0, 0], [2, 2, 2], [0, 0, 0]]) // left right
-	tileset.push([[0, 2, 0], [0, 2, 2], [0, 2, 0]]) // top right bottom
-	tileset.push([[0, 2, 0], [2, 2, 0], [0, 2, 0]]) // top left bottom
-	tileset.push([[0, 2, 0], [2, 2, 2], [0, 0, 0]]) // top left right
-	tileset.push([[0, 0, 0], [2, 2, 2], [0, 2, 0]]) // bottom left right*/
+	// FULL
+	tileset.push([[0, 0, 0], [0, 0, 0], [0, 0, 0]]) // 0
+	tileset.push([[2, 2, 2], [2, 2, 2], [2, 2, 2]]) // 1
 
-	tileset.push([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
-	tileset.push([[0, 0, 0], [1, 1, 1], [1, 1, 1]])
-	tileset.push([[1, 1, 1], [1, 1, 1], [0, 0, 0]])
-	tileset.push([[0, 1, 1], [0, 1, 1], [0, 1, 1]])
-	tileset.push([[1, 1, 0], [1, 1, 0], [1, 1, 0]])
+	// LINE TRANSITIONS
+	tileset.push([[0, 0, 0], [1, 1, 1], [2, 2, 2]]) // 2
+	tileset.push([[2, 2, 2], [1, 1, 1], [0, 0, 0]])	// 3
+	tileset.push([[0, 1, 2], [0, 1, 2], [0, 1, 2]])	// 4
+	tileset.push([[2, 1, 0], [2, 1, 0], [2, 1, 0]])	// 5
 
-	tileset.push([[0, 0, 0], [0, 1, 1], [0, 1, 1]])
-	tileset.push([[0, 0, 0], [1, 1, 0], [1, 1, 0]])
-	tileset.push([[0, 1, 1], [0, 1, 1], [0, 0, 0]])
-	tileset.push([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
+	// CORNER TRANSITIONS CONVEX
+	tileset.push([[0, 0, 0], [0, 1, 1], [0, 1, 2]]) // 6
+	tileset.push([[0, 0, 0], [1, 1, 0], [2, 1, 0]]) // 7
+	tileset.push([[0, 1, 2], [0, 1, 1], [0, 0, 0]]) // 8
+	tileset.push([[2, 1, 0], [1, 1, 0], [0, 0, 0]]) // 9
 
-	tileset.push([[2, 2, 2], [2, 2, 2], [2, 2, 2]])
-	tileset.push([[0, 0, 0], [2, 2, 2], [2, 2, 2]])
-	tileset.push([[2, 2, 2], [2, 2, 2], [0, 0, 0]])
-	tileset.push([[0, 2, 2], [0, 2, 2], [0, 2, 2]])
-	tileset.push([[2, 2, 0], [2, 2, 0], [2, 2, 0]])
+	tileset.push([[2, 2, 2], [2, 1, 1], [2, 1, 0]]) // 6
+	tileset.push([[2, 2, 2], [1, 1, 2], [0, 1, 2]]) // 7
+	tileset.push([[2, 1, 0], [2, 1, 1], [2, 2, 2]]) // 8
+	tileset.push([[0, 1, 2], [1, 1, 2], [2, 2, 2]]) // 9
 
-	tileset.push([[0, 0, 0], [0, 2, 2], [0, 2, 2]])
-	tileset.push([[0, 0, 0], [2, 2, 0], [2, 2, 0]])
-	tileset.push([[0, 2, 2], [0, 2, 2], [0, 0, 0]])
-	tileset.push([[2, 2, 0], [2, 2, 0], [0, 0, 0]])
+	// ROADS
+	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]]) // 10
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]]) // 11
+	tileset.push([[2, 2, 2], [3, 3, 3], [2, 2, 2]]) // 12
+	// tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]])	// 21
+	// tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]])	// 22
+	// tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]]) // 23
+	// tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]]) // 24
 
-	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]])
-	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]])
-	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]])
-	tileset.push([[0, 0, 0], [2, 2, 2], [2, 3, 2]])
-	tileset.push([[2, 3, 2], [2, 2, 2], [0, 0, 0]])
-	tileset.push([[0, 2, 2], [0, 2, 3], [0, 2, 2]])
-	tileset.push([[2, 2, 0], [3, 2, 0], [2, 2, 0]])
+	// ROAD ENDS
+	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]]) // 13
+	tileset.push([[2, 2, 2], [2, 3, 2], [2, 3, 2]]) // 14
+	tileset.push([[2, 2, 2], [2, 3, 3], [2, 2, 2]]) // 15
+	tileset.push([[2, 2, 2], [3, 3, 2], [2, 2, 2]]) // 16
+
+	// ROAD TURNS
+	tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]]) // 17
+	tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]]) // 18
+	tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]]) // 19
+	tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]]) // 20
 
 
-	
 
+
+	let adjacencies = []
+
+	for (let i = 0; i < tileset.length; ++i) {
+		adjacencies.push([10, 100, 1, 1, 1, 1, 1, 1, 1, 1, /*10*/  1, 1, 1, 1, 5, 5, 5, 5, 5, 5, /*20*/ 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+	}
 
 
 	let candidates = Array.from(Array(grid_width), () => new Array(grid_height))
@@ -190,19 +175,16 @@ function wfc_build_mesh(height_map) {
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			if (i === 0 && j === 0) {
-				map[i][j] = tileset[1]
+			if (i === 10 && j === 10) {
+				map[i][j] = [7]
 			}
-			else if (i === 9 && j === 9) {
-				map[i][j] = tileset[7]
-			}
-			// else if (i === 9 && j === 9) {
-			// 	map[i][j] = tileset[7]
-			// }
+			//else if (i === 11 && j === 10) {
+			//	map[i][j] = [19]
+			//}
 			else {
 				map[i][j] = []
 			}
-			
+
 			// map[i][j] = tileset[0]
 			// candidates[i][j] = tileset
 		}
@@ -210,15 +192,9 @@ function wfc_build_mesh(height_map) {
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			if (i === 0 && j === 0) {
+			if (i === 10 && j === 10) {
 				candidates[i][j] = []
 			}
-			else if (i === 9 && j === 9) {
-				candidates[i][j] = []
-			}
-			// else if (i === 9 && j === 9) {
-			// 	candidates[i][j] = []
-			// }
 			else {
 				candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
 			}
@@ -227,7 +203,7 @@ function wfc_build_mesh(height_map) {
 
 	let count = 0
 	while (!check_converged(candidates)) {
-		if (count >= 150) {
+		if (count >= 500) {
 			console.log("failed")
 			break
 		}
@@ -247,17 +223,55 @@ function wfc_build_mesh(height_map) {
 				break
 			}
 			for (let i = 0; i < grid_width; ++i) {
-				if (foundMin) { //TODO
+				if (foundMin) {
 					break
 				}
 				for (let j = 0; j < grid_height; ++j) {
 					// console.log(candidates[i][j].length)
 					if (candidates[i][j].length === k) {
 						let r = Math.floor(Math.random() * candidates[i][j].length)
-						// console.log(i, j, r)
-						// console.log(candidates[i][j][r])
-						map[i][j] = candidates[i][j][r]
-						// console.log(map)
+
+						console.log("------------------")
+						console.log(candidates[i][j], i, j)
+
+						let neighbors = []
+						if (i > 0 && map[i - 1][j].length > 0) {
+							neighbors.push(map[i - 1][j][0])
+						}
+						if (i < grid_width - 1 && map[i + 1][j].length > 0) {
+							neighbors.push(map[i + 1][j][0])
+						}
+						if (j > 0 && map[i][j - 1].length > 0) {
+							neighbors.push(map[i][j - 1][0])
+						}
+						if (j < grid_height - 1 && map[i][j + 1].length > 0) {
+							neighbors.push(map[i][j + 1][0])
+						}
+
+						// map the candidates to their adjacencies
+						let scores = []
+						for (let c = 0; c < candidates[i][j].length; ++c) {
+							let score = 0
+							for (let n = 0; n < neighbors.length; ++n) {
+								score += adjacencies[neighbors[n]][candidates[i][j][c]]
+							}
+							scores.push(score)
+						}
+
+
+						// select the candidates with the highest score
+						let weighted_candidates = []
+						for (let c = 0; c < candidates[i][j].length; ++c) {
+							for (let s = 0; s < scores[c]; ++s) {
+								weighted_candidates.push(candidates[i][j][c])
+							}
+						}
+
+						console.log(weighted_candidates)
+
+						r = Math.floor(Math.random() * weighted_candidates.length)
+
+						map[i][j] = [weighted_candidates[r]]
 						candidates[i][j] = []
 						foundMin = true
 						break
@@ -269,15 +283,17 @@ function wfc_build_mesh(height_map) {
 
 	}
 
-
-
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
 			if (map[i][j].length === 0) {
 				map[i][j] = [[4, 4, 4], [4, 4, 4], [4, 4, 4]]
 			}
+			else {
+				map[i][j] = tileset[map[i][j]]
+			}
 		}
 	}
+
 
 	// console.log("done")
 
@@ -382,8 +398,8 @@ function wfc_build_mesh(height_map) {
 
 			//vertices[idx] = [gx, gy, z];
 			//if(drawMap[gx][gy] !== 0) {
-				vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
-				// vertices[idx] = [gx, gy, z];
+			vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
+			// vertices[idx] = [gx, gy, z];
 			//}
 		}
 	}
@@ -451,23 +467,23 @@ export function init_terrain(regl, resources, height_map_buffer) {
 		draw({mat_projection, mat_view, light_position_cam}) {
 			mat4_matmul_many(this.mat_model_view, mat_view, this.mat_model_to_world)
 			mat4_matmul_many(this.mat_mvp, mat_projection, this.mat_model_view)
-	
+
 			mat3.fromMat4(this.mat_normals, this.mat_model_view)
 			mat3.transpose(this.mat_normals, this.mat_normals)
 			mat3.invert(this.mat_normals, this.mat_normals)
-	
+
 			pipeline_draw_terrain({
 				mat_mvp: this.mat_mvp,
 				mat_model_view: this.mat_model_view,
 				mat_normals: this.mat_normals,
-		
+
 				light_position: light_position_cam,
 			})
 		}
 	}
 
 	return {
-		terrain_actor : new TerrainActor(), 
+		terrain_actor : new TerrainActor(),
 		terrain_map : terrain_mesh.map
 	};
 }
