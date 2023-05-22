@@ -184,8 +184,8 @@ async function main() {
 	})()
 
 
-	const map_width = 40;
-	const map_height = 40;
+	const map_width = 20;
+	const map_height = 20;
 	texture_fbm.draw_texture_to_buffer({width: map_width, height: map_height, mouse_offset: [-12.24, 8.15]})
 
 	const init_terrain_response = init_terrain(regl, resources, texture_fbm.get_buffer())
@@ -225,28 +225,28 @@ async function main() {
 
 	const DIM_CELL = (map_DIM/map_width)/3;
 			
-	// for(let i = 0; i < map_width * 3; i++){
-	// 	for(let j = 0; j < map_height * 3; j++){
-	// 		var cell = terrain_map[i][j];
-	// 		switch(cell){
-	// 			case 0:
-	// 				drawingContext.fillStyle = waterColor;
-	// 				break;
-	// 			case 1:
-	// 				drawingContext.fillStyle = mountainColor;
-	// 				break;
-	// 			case 2:
-	// 				drawingContext.fillStyle = grassColor;
-	// 				break;
-	// 			case 3 :
-	// 				drawingContext.fillStyle = "red";
-	// 				break;
-	// 			default :
-	// 				break;
-	// 		}
-	// 		drawingContext.fillRect((map_width*3-1-i)*DIM_CELL,j*DIM_CELL,DIM_CELL,DIM_CELL);
-	// 	}	
-	// }
+	for(let i = 0; i < map_width * 3; i++){
+		for(let j = 0; j < map_height * 3; j++){
+			var cell = terrain_map[i][j];
+			switch(cell){
+				case 0:
+					drawingContext.fillStyle = waterColor;
+					break;
+				case 1:
+					drawingContext.fillStyle = mountainColor;
+					break;
+				case 2:
+					drawingContext.fillStyle = grassColor;
+					break;
+				case 3 :
+					drawingContext.fillStyle = "red";
+					break;
+				default :
+					break;
+			}
+			drawingContext.fillRect((map_width*3-1-i)*DIM_CELL,j*DIM_CELL,DIM_CELL,DIM_CELL);
+		}	
+	}
 	
 	/*
 	for(let i =0; i < map.width; i++){
