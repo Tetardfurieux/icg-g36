@@ -17,9 +17,13 @@ const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
 // varying float value;
 
-uniform int values[3600];
+uniform int values[900];
 
 varying vec3 pos_out;
+
+float modulo(float x, float y) {
+	return x - (y * floor(x / y));
+}
 
 void main()
 {
@@ -51,21 +55,47 @@ void main()
 
     // value = float(values[int(test)]);
 
-	int test = int(floor(x) + float(60) * floor(y));
+	float test = floor(x) + float(60) * floor(y);
+
+	int index = int(test / 4.0);
+	
+	int modul = int(modulo(test, 4.0));
 
 	float value = 0.0;
 
-	for (int x = 0; x < 3600; x++) {
-		if (x == test) {
+	for (int x = 0; x < 900; x++) {
+		if (x == index) {
 			value = float(values[x]);
 		}
 	}
 
+	float mod10 = modulo(value, 10.0);
+	float mod100 = modulo(value, 100.0);
+	float mod1000 = modulo(value, 1000.0);
+
+
+
+	if (modul == 3) {
+		// value = value mod 10;
+		value = mod10;
+	}
+	else if (modul == 2) {
+		value = mod100 / 10.0;
+	}
+	else if (modul == 1) {
+		value = mod1000 / 100.0;
+	}
+	else if (modul == 0) {
+		value = value / 1000.0;
+	}
+
+
+	// material_color = vec3(0.1 + float(index) / 20.0, 0.0, 0.0);
 
 
 
 
-	// if(height < terrain_water_level){
+
 	if (int(value) == 0) {
 		material_color = terrain_color_water;
 		shininess = 30.;
@@ -84,11 +114,17 @@ void main()
 		material_color = vec3(0.2, 0.2, 0.2);
 		shininess = 2.;
 	}
+	else if (int(value) > 4) {
+		// material_color = mix(terrain_color_grass, terrain_color_mountain, (height - terrain_water_level)*2.);
+		material_color = vec3(1.0, 1.0, 1.0);
+		shininess = 2.;
+	}
 	else {
 		material_color = vec3(0.0, 0.0, 0.0);
 	}
 
 
+	// material_color = vec3(0.1 + float(index) / 20.0, 0.1 + float(modulo) / 100.0, 0.0);
 
 	/*
 	if (pos_out.x <= -0.4) {

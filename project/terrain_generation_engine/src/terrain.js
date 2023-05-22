@@ -422,11 +422,16 @@ function wfc_build_mesh(height_map) {
 
 	console.log(vertices)
 
+	let valuesCompressed = []
+	for (let i = 0; i < values.length; i += 4) {
+		valuesCompressed.push(values[i] * 1000 + values[i + 1] * 100 + values[i + 2] * 10 + values[i + 3])
+	}
+
 	return {
 		vertex_positions: vertices,
 		vertex_normals: normals,
 		faces: faces,
-		vertex_values: values,
+		vertex_values: valuesCompressed,
 		map : drawMap
 	}
 }
