@@ -273,6 +273,7 @@ async function main() {
 
 
 	function validerOrCancel(mode){
+		minimap.style.cursor = "grab";
 		move.style.display = "none";
 		backToEdit.style.display = "none";
 		editTools.style.display = "block";
