@@ -296,7 +296,7 @@ async function main() {
 
 	regl.frame((frame) => {
 		if(update_needed) {
-			update_needed = false // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
+			update_needed = true // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
 
 			mat4.perspective(mat_projection,
 				deg_to_rad * 60, // fov y
@@ -318,6 +318,13 @@ async function main() {
 
 			// Set the whole image to black
 			regl.clear({color: [0.9, 0.9, 1., 1]})
+			const d = new Date();
+			let time = d.getTime() / 1000.;	
+			let r = Math.sin(time - Math.PI/2.0);
+			let g = Math.sin(time - Math.PI/2.0);
+			let b = Math.sin(time - Math.PI/2.0);
+
+			//regl.clear({color: [r, g, b, 1]})
 
 			terrain_actor.draw(scene_info)
 		}

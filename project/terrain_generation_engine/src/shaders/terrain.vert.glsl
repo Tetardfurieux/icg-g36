@@ -1,5 +1,7 @@
 attribute vec3 position;
 attribute vec3 normal;
+#define M_PI 3.1415926535897932384626433832795
+
 
 varying float v2f_height;
 
@@ -7,13 +9,14 @@ varying float v2f_height;
 varying vec3 v2f_normal;
 varying vec3 vertex_position;
 varying vec3 v2f_light_position;
+varying float time;
 
 uniform mat4 mat_mvp;
 uniform mat4 mat_model_view;
 uniform mat3 mat_normals; // mat3 not 4, because normals are only rotated and not translated
 
 uniform vec4 light_position; //in camera space coordinates already
-
+uniform float u_time;
 
 // get array of float from uniform
 // uniform int values[225];
@@ -24,7 +27,7 @@ void main()
 {
     v2f_height = position.z;
     vec4 position_v4 = vec4(position, 1);
-
+    time = sin(u_time * 10000.0 - M_PI/2.0);
     /** #TODO PG1.6.1:
 	Setup all outgoing variables so that you can compute in the fragmend shader
     the phong lighting. You will need to setup all the uniforms listed above, before you

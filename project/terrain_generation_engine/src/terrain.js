@@ -453,6 +453,7 @@ export function init_terrain(regl, resources, height_map_buffer) {
 
 			light_position: regl.prop('light_position'),
 			values: terrain_mesh.vertex_values,
+			u_time: performance.now() / 1000,
 		},
 		elements: terrain_mesh.faces,
 
