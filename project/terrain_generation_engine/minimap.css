@@ -54,7 +54,7 @@
     display: none;
 }
 
-#zoomIn, #zoomOut, #edit1, #edit2, #valider, #cancel, #back_to_edit, #move
+#zoomIn, #zoomOut, #edit1, #edit2, #edit3, #valider, #cancel, #back_to_edit, #move
 {
     cursor : pointer;
     height : 45px;

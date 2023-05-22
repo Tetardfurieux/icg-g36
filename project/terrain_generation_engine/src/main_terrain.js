@@ -221,6 +221,7 @@ async function main() {
 
 	const edit1 = document.getElementById('edit1');
 	const edit2 = document.getElementById('edit2');
+	const edit3 = document.getElementById('edit3');
 	
 	const valider = document.getElementById('valider');
 	const cancel = document.getElementById('cancel');
@@ -260,6 +261,8 @@ async function main() {
 			case 1 :
 				break;
 			case 2 : 
+				break;
+			case 3:
 				availableTiles.style.display = "block";
 				break;
 		}
@@ -269,6 +272,9 @@ async function main() {
 	});
 	edit2.addEventListener('click', () => {
 		edit(2);
+	});
+	edit3.addEventListener('click', () => {
+		edit(3);
 	});
 
 
