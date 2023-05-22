@@ -102,8 +102,8 @@ function compute_candidates(tileset, map, candidates, x, y) {
 }
 
 function wfc_build_mesh(height_map) {
-	let grid_width = 15 // height_map.width
-	let grid_height = 15 // height_map.height
+	let grid_width = 10 // height_map.width
+	let grid_height = 10 // height_map.height
 
 	const WATER_LEVEL = -0.03125
 
@@ -175,7 +175,7 @@ function wfc_build_mesh(height_map) {
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			if (i === 10 && j === 10) {
+			if (i === 5 && j === 5) {
 				map[i][j] = [7]
 			}
 			//else if (i === 11 && j === 10) {
@@ -192,7 +192,7 @@ function wfc_build_mesh(height_map) {
 
 	for (let i = 0; i < grid_width; ++i) {
 		for (let j = 0; j < grid_height; ++j) {
-			if (i === 10 && j === 10) {
+			if (i === 5 && j === 5) {
 				candidates[i][j] = []
 			}
 			else {

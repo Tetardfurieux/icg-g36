@@ -184,8 +184,8 @@ async function main() {
 	})()
 
 
-	const map_width = 15;
-	const map_height = 15;
+	const map_width = 10;
+	const map_height = 10;
 	texture_fbm.draw_texture_to_buffer({width: map_width, height: map_height, mouse_offset: [-12.24, 8.15]})
 
 	const init_terrain_response = init_terrain(regl, resources, texture_fbm.get_buffer())
