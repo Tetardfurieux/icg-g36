@@ -239,7 +239,7 @@ async function main() {
 					drawingContext.fillStyle = grassColor;
 					break;
 				case 3 :
-					drawingContext.fillStyle = "red";
+					drawingContext.fillStyle = roadColor;
 					break;
 				default :
 					break;
