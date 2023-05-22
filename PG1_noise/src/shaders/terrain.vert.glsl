@@ -7,6 +7,8 @@ varying float v2f_height;
 varying vec3 v2f_normal;
 varying vec3 vertex_position;
 varying vec3 v2f_light_position;
+varying float time;
+
 
 uniform mat4 mat_mvp;
 uniform mat4 mat_model_view;
@@ -47,6 +49,8 @@ void main()
 	// gl_Position = vec4(values[0]);
 	gl_Position = mat_mvp * position_v4;
 
+    //float d = new Date();
+	//time = Date().getTime() / 1000.0;
 
 
 

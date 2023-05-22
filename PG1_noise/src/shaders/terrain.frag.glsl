@@ -1,4 +1,8 @@
 precision highp float;
+#define M_PI 3.1415926535897932384626433832795
+
+
+
 
 varying float v2f_height;
 
@@ -7,8 +11,7 @@ varying vec3 v2f_normal;
 varying vec3 vertex_position;
 varying vec3 v2f_light_position;
 
-
-const vec3  light_color = vec3(1.0, 0.941, 0.898);
+vec3  light_color = vec3(1.0, 0.941, 0.898);
 // Small perturbation to prevent "z-fighting" on the water on some machines...
 const float terrain_water_level    = -0.03125 + 1e-6;
 const vec3  terrain_color_water    = vec3(0.29, 0.51, 0.62);
@@ -18,12 +21,15 @@ const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 // varying float value;
 
 uniform int values[900];
+uniform float u_time;
 
 varying vec3 pos_out;
 
 void main()
 {
-	const vec3 ambient = 0.2 * light_color; // Ambient light intensity
+	//light_color = sin(time) * vec3(1.0, 0.941, 0.898);
+	light_color = sin(u_time - M_PI/2.0) * vec3(1.0, 0.941, 0.898);
+	vec3 ambient = 0.2 * light_color; // Ambient light intensity
 	float height = v2f_height;
 
 	/* #TODO PG1.6.1
