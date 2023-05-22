@@ -214,6 +214,24 @@ async function main() {
 	}
 
 	const minimap = document.getElementById('map_visual');
+
+	const editTools = document.getElementById("editTools");
+	const validationTools = document.getElementById("validerOrCancel");
+	const availableTiles = document.getElementById("availableTiles");
+
+	const edit1 = document.getElementById('edit1');
+	const edit2 = document.getElementById('edit2');
+	
+	const valider = document.getElementById('valider');
+	const cancel = document.getElementById('cancel');
+
+	const zoomIn = document.getElementById('zoomIn');
+	const zoomOut = document.getElementById('zoomOut');
+	const backToEdit = document.getElementById('back_to_edit');
+	const move = document.getElementById('move');
+
+
+	/* event listener and handler */
 	minimap.addEventListener('click', () => {
 		handleMinimapClick();
 	});
@@ -225,21 +243,17 @@ async function main() {
 	function zoomOutMap(){
 		// alert("zoom out");
 	}
-
-	const zoomIn = document.getElementById('zoomIn');
 	zoomIn.addEventListener('click', () => {
 		zoomInMap();
 	});
-	const zoomOut = document.getElementById('zoomOut');
 	zoomOut.addEventListener('click', () => {
 		zoomOutMap();
 	});
 
-	const editTools = document.getElementById("editTools");
-	const validationTools = document.getElementById("validerOrCancel");
-	const availableTiles = document.getElementById("availableTiles");
-	
 	function edit(mode){
+		inEditorMode = true;
+		move.style.display = "inline";
+		minimap.style.cursor = "crosshair";
 		editTools.style.display = "none";
 		validationTools.style.display = "block";
 		switch(mode){
@@ -250,16 +264,17 @@ async function main() {
 				break;
 		}
 	}
-	const edit1 = document.getElementById('edit1');
 	edit1.addEventListener('click', () => {
 		edit(1);
 	});
-	const edit2 = document.getElementById('edit2');
 	edit2.addEventListener('click', () => {
 		edit(2);
 	});
 
+
 	function validerOrCancel(mode){
+		move.style.display = "none";
+		backToEdit.style.display = "none";
 		editTools.style.display = "block";
 		validationTools.style.display = "none";
 		availableTiles.style.display = "none";
@@ -270,15 +285,37 @@ async function main() {
 				break;
 		}
 	}
-	const valider = document.getElementById('valider');
 	valider.addEventListener('click', () => {
 		validerOrCancel(1);
 	});
-	const cancel = document.getElementById('cancel');
 	cancel.addEventListener('click', () => {
 		validerOrCancel(2);
 	});
 	
+	
+	function moveOrEdit(mode){
+		switch(mode){
+			case 1 :
+				backToEdit.style.display = "inline";
+				move.style.display = "none";
+				minimap.style.cursor = "grab";
+				break;
+			case 2 :
+				backToEdit.style.display = "none";
+				move.style.display = "inline";
+				minimap.style.cursor = "crosshair";
+				break;
+		}
+	}
+	move.addEventListener('click', () => {
+		moveOrEdit(1);
+	});
+	backToEdit.addEventListener('click', () => {
+		moveOrEdit(2);
+	});
+
+
+	/* minimap drawing */
 	const map_DIM = 300;
 	minimap.width = map_DIM;
 	minimap.height = map_DIM;
