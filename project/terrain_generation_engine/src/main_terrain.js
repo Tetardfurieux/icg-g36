@@ -205,9 +205,6 @@ async function main() {
 	var isMinimapVisible = true;
 
 	var inEditorMode = false;
-	function handleMinimapClick(){
-		alert("map editor mode not implemented yet");
-	}
 
 	const minimap = document.getElementById('map_visual');
 
@@ -228,9 +225,16 @@ async function main() {
 	const move = document.getElementById('move');
 
 
+
 	/* event listener and handler */
-	minimap.addEventListener('click', () => {
-		handleMinimapClick();
+	function handleMinimapClick(event){
+		let boundingRect = minimap.getBoundingClientRect();
+		let xWithinCanvas = event.pageX - boundingRect.left;
+		let yWithinCanvas = event.pageY - boundingRect.top;
+		alert(`you clicked here : (${xWithinCanvas},${yWithinCanvas})`)
+	}
+	minimap.addEventListener('click', (event) => {
+		handleMinimapClick(event);
 	});
 	const drawingContext = minimap.getContext("2d");
 
@@ -426,8 +430,8 @@ async function main() {
 
 
 	function activate_preset_view() {
-		cam_angle_z = -1.0
-		cam_angle_y = -0.42
+		cam_angle_z = 1.3
+		cam_angle_y = -0.5
 		cam_distance_factor = 1.0
 		cam_target = [0, 0, 0]
 
