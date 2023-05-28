@@ -188,32 +188,174 @@ async function main() {
 	const map_height = 20;
 	texture_fbm.draw_texture_to_buffer({width: map_width, height: map_height, mouse_offset: [-12.24, 8.15]})
 
-	const init_terrain_response = init_terrain(regl, resources, texture_fbm.get_buffer())
-	const terrain_actor = init_terrain_response.terrain_actor;
-	const terrain_map = init_terrain_response.terrain_map; 
+	var init_terrain_response;
+	var terrain_map = null;
+	var terrain_actor = null;
+	
+	function generateTerrain(generator){
+		init_terrain_response = init_terrain(regl, resources, texture_fbm.get_buffer())
+	 	terrain_actor = init_terrain_response.terrain_actor;
+		terrain_map = init_terrain_response.terrain_map; 
+	}
 
 	/*---------------------------------------------------------------
 		Minimap
 	---------------------------------------------------------------*/
 	const map = document.getElementById('minimap');
 	var isMinimapVisible = true;
-	document.addEventListener('keypress', (event) => {
-		if (event.key === 'm') {
-			if(isMinimapVisible){
-				map.style.display = "none";
-			}else{
-				map.style.display = "block";
-			}
-			isMinimapVisible = !isMinimapVisible;
-		}
-	});
+
+	var inEditorMode = false;
 
 	const minimap = document.getElementById('map_visual');
+
+	const editTools = document.getElementById("editTools");
+	const validationTools = document.getElementById("validerOrCancel");
+	const availableTiles = document.getElementById("availableTiles");
+
+	const edit1 = document.getElementById('edit1');
+	const edit2 = document.getElementById('edit2');
+	const edit3 = document.getElementById('edit3');
+	
+	const valider = document.getElementById('valider');
+	const cancel = document.getElementById('cancel');
+
+	const zoomIn = document.getElementById('zoomIn');
+	const zoomOut = document.getElementById('zoomOut');
+	const backToEdit = document.getElementById('back_to_edit');
+	const move = document.getElementById('move');
+
+
+
+	/* event listener and handler */
+	function handleMinimapClick(event){
+		let boundingRect = minimap.getBoundingClientRect();
+		let xWithinCanvas = event.pageX - boundingRect.left;
+		let yWithinCanvas = event.pageY - boundingRect.top;
+		alert(`you clicked here : (${xWithinCanvas},${yWithinCanvas})`)
+	}
 	minimap.addEventListener('click', (event) => {
-		alert("map editor mode not implemented yet");
+		handleMinimapClick(event);
 	});
 	const drawingContext = minimap.getContext("2d");
+
+	function zoomInMap(){
+		// alert("zoom in");
+	}
+	function zoomOutMap(){
+		// alert("zoom out");
+	}
+	zoomIn.addEventListener('click', () => {
+		zoomInMap();
+	});
+	zoomOut.addEventListener('click', () => {
+		zoomOutMap();
+	});
+
+	function edit(mode){
+		inEditorMode = true;
+		move.style.display = "inline";
+		minimap.style.cursor = "crosshair";
+		editTools.style.display = "none";
+		validationTools.style.display = "block";
+		switch(mode){
+			case 1 :
+				break;
+			case 2 : 
+				break;
+			case 3:
+				availableTiles.style.display = "block";
+				break;
+		}
+	}
+	edit1.addEventListener('click', () => {
+		edit(1);
+	});
+	edit2.addEventListener('click', () => {
+		edit(2);
+	});
+	edit3.addEventListener('click', () => {
+		edit(3);
+	});
+
+	function regenerate(){
+		generateTerrain(null);
+		drawMap();
+		update_needed=true;
+		render();
+	}
+
+	function keyPressAction(event){
+		switch(event.key){
+			// minimap hide / display 
+			case 'm':
+				if(isMinimapVisible){
+					map.style.display = "none";
+				}else{
+					map.style.display = "block";
+				}
+				isMinimapVisible = !isMinimapVisible;
+				break;
+			case 'r':
+				regenerate()
+				break;
+			case '': 
+				break;
+			case '': 
+				break;
+			case '': 
+				break;
+		}
+	}
+	document.addEventListener("keypress", event => {
+		keyPressAction(event);
+	})
+
+
+	function validerOrCancel(mode){
+		minimap.style.cursor = "grab";
+		move.style.display = "none";
+		backToEdit.style.display = "none";
+		editTools.style.display = "block";
+		validationTools.style.display = "none";
+		availableTiles.style.display = "none";
+		switch(mode){
+			case 1 :
+				break;
+			case 2 :
+				break;
+		}
+	}
+	valider.addEventListener('click', () => {
+		validerOrCancel(1);
+	});
+	cancel.addEventListener('click', () => {
+		validerOrCancel(2);
+	});
 	
+	
+	function moveOrEdit(mode){
+		switch(mode){
+			case 1 :
+				backToEdit.style.display = "inline";
+				move.style.display = "none";
+				minimap.style.cursor = "grab";
+				break;
+			case 2 :
+				backToEdit.style.display = "none";
+				move.style.display = "inline";
+				minimap.style.cursor = "crosshair";
+				break;
+		}
+	}
+	move.addEventListener('click', () => {
+		moveOrEdit(1);
+	});
+	backToEdit.addEventListener('click', () => {
+		moveOrEdit(2);
+	});
+
+
+	/* minimap drawing */
 	const map_DIM = 300;
 	minimap.width = map_DIM;
 	minimap.height = map_DIM;
@@ -221,32 +363,48 @@ async function main() {
 	const roadColor = "rgb(127, 100, 100)";
 	const waterColor = "rgb(79, 202, 227)";
 	const grassColor = "rgb(154, 217, 138)";
-	const mountainColor = "rgb(231, 217, 195)";
+	const sandColor = "rgb(231, 217, 195)";
 
 	const DIM_CELL = (map_DIM/map_width)/3;
-			
-	for(let i = 0; i < map_width * 3; i++){
-		for(let j = 0; j < map_height * 3; j++){
-			var cell = terrain_map[i][j];
-			switch(cell){
-				case 0:
-					drawingContext.fillStyle = waterColor;
-					break;
-				case 1:
-					drawingContext.fillStyle = mountainColor;
-					break;
-				case 2:
-					drawingContext.fillStyle = grassColor;
-					break;
-				case 3 :
-					drawingContext.fillStyle = "red";
-					break;
-				default :
-					break;
-			}
-			drawingContext.fillRect((map_width*3-1-i)*DIM_CELL,j*DIM_CELL,DIM_CELL,DIM_CELL);
-		}	
+
+	var currentScale = 1; // x1, x2, x4, x8
+	var centeredOn = {x:null, y:null};
+		
+	function drawMap(){
+
+		// make use of the currentScale and the centeredOn to display 
+		// the map properly
+
+		for(let i = 0; i < map_width * 3; i++){
+			for(let j = 0; j < map_height * 3; j++){
+				var cell = terrain_map[i][j];
+				switch(cell){
+					case 0:
+						drawingContext.fillStyle = waterColor;
+						break;
+					case 1:
+						drawingContext.fillStyle = sandColor;
+						break;
+					case 2:
+						drawingContext.fillStyle = grassColor;
+						break;
+					case 3 :
+						drawingContext.fillStyle = roadColor;
+						break;
+					default :
+						break;
+				}
+				drawingContext.fillRect((map_width*3-1-i)*DIM_CELL,j*DIM_CELL,DIM_CELL,DIM_CELL);
+			}	
+		}
 	}
+
+	window.addEventListener("resize", event => {
+		minimap.width = map_DIM;
+		minimap.height = map_DIM;
+		drawMap();
+	})
+	
 	
 	/*
 	for(let i =0; i < map.width; i++){
@@ -272,8 +430,8 @@ async function main() {
 
 
 	function activate_preset_view() {
-		cam_angle_z = -1.0
-		cam_angle_y = -0.42
+		cam_angle_z = 1.3
+		cam_angle_y = -0.5
 		cam_distance_factor = 1.0
 		cam_target = [0, 0, 0]
 
@@ -286,34 +444,42 @@ async function main() {
 	/*---------------------------------------------------------------
 		Frame render
 	---------------------------------------------------------------*/
-	const mat_projection = mat4.create()
-	const mat_view = mat4.create()
 
-	let light_position_world = [0.2, -0.3, 0.8, 1.0]
-	//let light_position_world = [1, -1, 1., 1.0]
+	function render(){
+		const mat_projection = mat4.create()
+		const mat_view = mat4.create()
 
-	const light_position_cam = [0, 0, 0, 0]
+		let light_position_world = [0.2, -0.3, 0.8, 1.0]
+		//let light_position_world = [1, -1, 1., 1.0]
 
-	regl.frame((frame) => {
-		if(update_needed) {
-			update_needed = true // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
+		const light_position_cam = [0, 0, 0, 0]
 
-			mat4.perspective(mat_projection,
-				deg_to_rad * 60, // fov y
-				frame.framebufferWidth / frame.framebufferHeight, // aspect ratio
-				0.01, // near
-				100, // far
-			)
+		regl.frame((frame) => {
+			if(update_needed) {
+				update_needed = false // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
 
-			mat4.copy(mat_view, mat_turntable)
+				mat4.perspective(mat_projection,
+					deg_to_rad * 60, // fov y
+					frame.framebufferWidth / frame.framebufferHeight, // aspect ratio
+					0.01, // near
+					100, // far
+				)
 
-			// Calculate light position in camera frame
-			vec4.transformMat4(light_position_cam, light_position_world, mat_view)
+				mat4.copy(mat_view, mat_turntable)
 
-			const scene_info = {
-				mat_view:        mat_view,
-				mat_projection:  mat_projection,
-				light_position_cam: light_position_cam,
+				// Calculate light position in camera frame
+				vec4.transformMat4(light_position_cam, light_position_world, mat_view)
+
+				const scene_info = {
+					mat_view:        mat_view,
+					mat_projection:  mat_projection,
+					light_position_cam: light_position_cam,
+				}
+
+				// Set the whole image to black
+				regl.clear({color: [0.9, 0.9, 1., 1]})
+
+				terrain_actor.draw(scene_info)
 			}
 
 			// Set the whole image to black
@@ -326,14 +492,10 @@ async function main() {
 
 			//regl.clear({color: [r, g, b, 1]})
 
-			terrain_actor.draw(scene_info)
-		}
-
-// 		debug_text.textContent = `
-// Hello! Sim time is ${sim_time.toFixed(2)} s
-// Camera: angle_z ${(cam_angle_z / deg_to_rad).toFixed(1)}, angle_y ${(cam_angle_y / deg_to_rad).toFixed(1)}, distance ${(cam_distance_factor*cam_distance_base).toFixed(1)}
-// `
-	})
+	// generate the map 
+	generateTerrain(null)
+	drawMap()
+	render()
+	})}
 }
-
 DOM_loaded_promise.then(main)

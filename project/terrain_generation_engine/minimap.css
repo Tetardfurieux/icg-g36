@@ -16,8 +16,6 @@
     border : 3px solid rgb(17, 17, 17);
     border-radius: 10px;
     padding : 10px;
-
-    cursor : move;
 }
 
 #minimap p
@@ -35,5 +33,51 @@
 
     border : 3px solid rgb(17, 17, 17);
     background-color: white;
+    cursor : grab;
+}
+
+.tools
+{
+    width : 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items : center;
+}
+
+#zoomTools, #editTools, #validerOrCancel
+{
+    width : wrap;
+}
+#validerOrCancel
+{
+    display: none;
+}
+
+#zoomIn, #zoomOut, #edit1, #edit2, #edit3, #valider, #cancel, #back_to_edit, #move
+{
     cursor : pointer;
+    height : 45px;
+    transition : transform 200ms;
+    &:hover
+    {
+        transform : scale(1.2);
+        transition : 50ms;
+    }
+    &:active
+    {
+    transform : scale(1);
+    }
+}
+
+#availableTiles
+{
+    display : none;
+    margin-block : 1em;
+    border : 3px solid rgb(17, 17, 17);
+}
+#move, #back_to_edit
+{
+    display : none;
+    margin-left : 10px;
 }
