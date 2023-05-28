@@ -32,7 +32,7 @@ float modulo(float x, float y) {
 
 void main()
 {
-	light_color = time * vec3(1.0, 0.941, 0.898);
+	light_color = vec3(1.0, 0.941, 0.898);
 	vec3 ambient = 0.2 * light_color; // Ambient light intensity
 	float height = v2f_height;
 
