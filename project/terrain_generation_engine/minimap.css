@@ -4,7 +4,7 @@
 #minimap
 {
     z-index : 2;
-    position : fixed; 
+    position : absolute; 
     top : 10px;
     right : 10px;
     
@@ -16,6 +16,8 @@
     border : 3px solid rgb(17, 17, 17);
     border-radius: 10px;
     padding : 10px;
+
+    cursor: move;
 }
 
 #minimap p
