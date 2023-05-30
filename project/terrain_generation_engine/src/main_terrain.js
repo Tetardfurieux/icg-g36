@@ -213,15 +213,15 @@ async function main() {
 
 	const edit1 = document.getElementById('edit1');
 	const edit2 = document.getElementById('edit2');
-	const edit3 = document.getElementById('edit3');
+	// const edit3 = document.getElementById('edit3');
 	
 	const valider = document.getElementById('valider');
 	const cancel = document.getElementById('cancel');
 
-	const zoomIn = document.getElementById('zoomIn');
-	const zoomOut = document.getElementById('zoomOut');
-	const backToEdit = document.getElementById('back_to_edit');
-	const move = document.getElementById('move');
+	// const zoomIn = document.getElementById('zoomIn');
+	// const zoomOut = document.getElementById('zoomOut');
+	// const backToEdit = document.getElementById('back_to_edit');
+	// const move = document.getElementById('move');
 
 
 
@@ -338,12 +338,12 @@ async function main() {
 		}
 	});
 
-
+	/*
 	function zoomInOutMap(mode){
 		switch(mode){
 			case -1:
 				// zoom Out
-				/* alert("zoom out"); */
+				// alert("zoom out");
 				if(currentScale < 16){
 					currentScale *= 2;
 					drawMap(true);
@@ -351,7 +351,7 @@ async function main() {
 				break;
 			case 1:
 				// zoom In
-				/* alert("zoom in"); */
+				// alert("zoom in");
 				if(currentScale > 1){
 					currentScale /= 2;
 					drawMap(true);
@@ -365,12 +365,13 @@ async function main() {
 	zoomOut.addEventListener('click', () => {
 		zoomInOutMap(-1);
 	});
+	*/
 
 
 	var editMode = 0;
 	function edit(mode){
 		inEditorMode = true;
-		move.style.display = "inline";
+		// move.style.display = "inline";
 		minimap.style.cursor = "crosshair";
 		editTools.style.display = "none";
 		validationTools.style.display = "block";
@@ -394,15 +395,17 @@ async function main() {
 	edit2.addEventListener('click', () => {
 		edit(2);
 	});
+	/*
 	edit3.addEventListener('click', () => {
 		edit(3);
 	});
+	*/
 
 	function regenerate(){
 		inEditorMode = false;
 		minimap.style.cursor = "grab";
-		move.style.display = "none";
-		backToEdit.style.display = "none";
+		// move.style.display = "none";
+		// backToEdit.style.display = "none";
 		editTools.style.display = "block";
 		validationTools.style.display = "none";
 		availableTiles.style.display = "none";
@@ -459,8 +462,8 @@ async function main() {
 
 	function validerOrCancel(mode){
 		minimap.style.cursor = "grab";
-		move.style.display = "none";
-		backToEdit.style.display = "none";
+		// move.style.display = "none";
+		// backToEdit.style.display = "none";
 		editTools.style.display = "block";
 		validationTools.style.display = "none";
 		availableTiles.style.display = "none";
@@ -514,6 +517,7 @@ async function main() {
 		validerOrCancel(2);
 	});
 	
+	/*
 	function moveOrEdit(mode){
 		switch(mode){
 			case 1 :
@@ -534,6 +538,7 @@ async function main() {
 	backToEdit.addEventListener('click', () => {
 		moveOrEdit(2);
 	});
+	*/
 
 	/* minimap drawing */
 	const drawingContext = minimap.getContext("2d");
