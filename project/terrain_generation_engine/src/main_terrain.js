@@ -29,7 +29,6 @@ async function main() {
 
 
 	let update_needed = true
-
 	{
 		// Resize canvas to fit the window, but keep it square.
 		function resize_canvas() {
@@ -191,78 +190,201 @@ async function main() {
 	var init_terrain_response;
 	var terrain_map = null;
 	var terrain_actor = null;
+	var tile_map = null;
 	
 	function generateTerrain(generator){
-		init_terrain_response = init_terrain(regl, resources, texture_fbm.get_buffer())
+		init_terrain_response = init_terrain(regl, resources, texture_fbm.get_buffer(), generator)
 	 	terrain_actor = init_terrain_response.terrain_actor;
 		terrain_map = init_terrain_response.terrain_map; 
+		tile_map = init_terrain_response.tile_map;
 	}
 
 	/*---------------------------------------------------------------
 		Minimap
 	---------------------------------------------------------------*/
 	const map = document.getElementById('minimap');
-	var isMinimapVisible = true;
 
-	var inEditorMode = false;
+	var isMinimapVisible = true;
 
 	const minimap = document.getElementById('map_visual');
 
-	const editTools = document.getElementById("editTools");
 	const validationTools = document.getElementById("validerOrCancel");
 	const availableTiles = document.getElementById("availableTiles");
 
 	const edit1 = document.getElementById('edit1');
 	const edit2 = document.getElementById('edit2');
-	const edit3 = document.getElementById('edit3');
+	// const edit3 = document.getElementById('edit3');
 	
 	const valider = document.getElementById('valider');
 	const cancel = document.getElementById('cancel');
 
-	const zoomIn = document.getElementById('zoomIn');
-	const zoomOut = document.getElementById('zoomOut');
-	const backToEdit = document.getElementById('back_to_edit');
-	const move = document.getElementById('move');
+	// const zoomIn = document.getElementById('zoomIn');
+	// const zoomOut = document.getElementById('zoomOut');
+	// const backToEdit = document.getElementById('back_to_edit');
+	// const move = document.getElementById('move');
 
 
 
-	/* event listener and handler */
-	function handleMinimapClick(event){
+	/* return tile index of the tile under the mouse cursor */
+	function tileAtMouseCursorIndex(mouseEvent){
 		let boundingRect = minimap.getBoundingClientRect();
-		let xWithinCanvas = event.pageX - boundingRect.left;
-		let yWithinCanvas = event.pageY - boundingRect.top;
-		alert(`you clicked here : (${xWithinCanvas},${yWithinCanvas})`)
+		let xWithinCanvas = mouseEvent.pageX - boundingRect.left;
+		let yWithinCanvas = mouseEvent.pageY - boundingRect.top;
+
+		return {
+			x: Math.floor(xWithinCanvas/ map_DIM * map_width),
+			y: Math.floor(yWithinCanvas / map_DIM * map_height)
+		};
+	}
+
+	/* FSM state variables */
+	var inEditorMode = false;
+
+	/* handle clicks on the map */
+	var selectedTiles = []; // for mode 1 and 2  
+	var composition = []; // for mode 3
+
+	
+	function handleMinimapClick(mouseEvent){
+		
+		if(inEditorMode){
+			/* alert("map clicked in editor mode !") */
+			switch(editMode){
+				case 1 :
+				case 2 :
+					// select tiles to conserve / remove 
+					var selectedTile = tileAtMouseCursorIndex(mouseEvent);
+					for(let index in selectedTiles){
+						var tileIndex = selectedTiles[index];
+						if(tileIndex.x == selectedTile.x && tileIndex.y == selectedTile.y){
+							selectedTiles.splice(index,1);
+							return;
+						}
+					}
+					selectedTiles.push(selectedTile);
+					break;										
+				case 3 :
+					// pose tiles 
+					break;
+			}
+		}else{
+			/* alert("not in editor mode :(") */
+		}
 	}
 	minimap.addEventListener('click', (event) => {
 		handleMinimapClick(event);
 	});
-	const drawingContext = minimap.getContext("2d");
+	
+	/* handle mouse move on the map */
+	var tileIndex = null;
+	minimap.addEventListener("mousemove", mouseEvent => {
+		if(inEditorMode){
 
-	function zoomInMap(){
-		// alert("zoom in");
-	}
-	function zoomOutMap(){
-		// alert("zoom out");
+			var tileIndexPointedByMouse = tileAtMouseCursorIndex(mouseEvent)
+			// alert(`${tileIndexPointedByMouse.x}, ${tileIndexPointedByMouse.y}`);
+
+			if(tileIndex == null){
+				/* alert("you entered the canvas"); */
+				tileIndex = tileIndexPointedByMouse;
+				switch(editMode){
+					case 1:
+						drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,true);
+						break;
+					case 2:
+						drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,false);
+						break;
+					case 3 : 
+						break;
+				}
+				
+			}else{
+				if(tileIndex.x != tileIndexPointedByMouse.x || tileIndex.y != tileIndexPointedByMouse.y){
+					/* alert("you are over a new tile"); */	
+
+					var isTileSelected = false;
+					if(editMode == 1 || editMode == 2){
+						for(let tile of selectedTiles){
+							if(tile.x == tileIndex.x && tile.y == tileIndex.y){
+								isTileSelected = true;
+								break;
+							}
+						}
+					}
+
+					switch(editMode){
+						case 1:
+							drawTile(tileIndex.x*TILE_SIZE,tileIndex.y*TILE_SIZE,tileIndex.x,tileIndex.y,isTileSelected);
+							break;
+						case 2:
+							drawTile(tileIndex.x*TILE_SIZE,tileIndex.y*TILE_SIZE,tileIndex.x,tileIndex.y,!isTileSelected);
+							break;
+						case 3 : 
+							break;
+					}
+
+					tileIndex = tileIndexPointedByMouse;
+					switch(editMode){
+						case 1:
+							drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,true);
+							break;
+						case 2:
+							drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,false);
+							break;
+						case 3 : 
+							break;
+					}
+				}
+			}
+		}
+	});
+
+	/*
+	function zoomInOutMap(mode){
+		switch(mode){
+			case -1:
+				// zoom Out
+				// alert("zoom out");
+				if(currentScale < 16){
+					currentScale *= 2;
+					drawMap(true);
+				}	
+				break;
+			case 1:
+				// zoom In
+				// alert("zoom in");
+				if(currentScale > 1){
+					currentScale /= 2;
+					drawMap(true);
+				}
+				break;
+		}
 	}
 	zoomIn.addEventListener('click', () => {
-		zoomInMap();
+		zoomInOutMap(1);
 	});
 	zoomOut.addEventListener('click', () => {
-		zoomOutMap();
+		zoomInOutMap(-1);
 	});
+	*/
 
+
+	var editMode = 0;
 	function edit(mode){
 		inEditorMode = true;
-		move.style.display = "inline";
+		// move.style.display = "inline";
 		minimap.style.cursor = "crosshair";
 		editTools.style.display = "none";
 		validationTools.style.display = "block";
 		switch(mode){
 			case 1 :
+				editMode = 1;
+				drawMap(false);
 				break;
 			case 2 : 
+				editMode = 2;
 				break;
 			case 3:
+				editMode = 3;
 				availableTiles.style.display = "block";
 				break;
 		}
@@ -273,16 +395,37 @@ async function main() {
 	edit2.addEventListener('click', () => {
 		edit(2);
 	});
+	/*
 	edit3.addEventListener('click', () => {
 		edit(3);
 	});
+	*/
 
 	function regenerate(){
+		inEditorMode = false;
+		minimap.style.cursor = "grab";
+		// move.style.display = "none";
+		// backToEdit.style.display = "none";
+		editTools.style.display = "block";
+		validationTools.style.display = "none";
+		availableTiles.style.display = "none";
+		selectedTiles = [];
+
 		generateTerrain(null);
-		drawMap();
 		update_needed=true;
 		render();
+		drawMap(true);
 	}
+
+	function regenerateFromArray(initTileArray){
+		generateTerrain(initTileArray);
+		update_needed=true;
+		render();
+		drawMap(true);
+	}
+	
+	var intervall = null;
+	var diaporamaRunning = false;
 
 	function keyPressAction(event){
 		switch(event.key){
@@ -298,10 +441,17 @@ async function main() {
 			case 'r':
 				regenerate()
 				break;
-			case '': 
+			/*
+			case 'p': 
+				if(diaporamaRunning){
+					clearInterval(intervall);
+					diaporamaRunning = false;
+				}else{
+					intervall = setInterval(regenerate, 1000);
+					diaporamaRunning = true;
+				}
 				break;
-			case '': 
-				break;
+			*/
 			case '': 
 				break;
 		}
@@ -310,20 +460,55 @@ async function main() {
 		keyPressAction(event);
 	})
 
-
 	function validerOrCancel(mode){
 		minimap.style.cursor = "grab";
-		move.style.display = "none";
-		backToEdit.style.display = "none";
+		// move.style.display = "none";
+		// backToEdit.style.display = "none";
 		editTools.style.display = "block";
 		validationTools.style.display = "none";
 		availableTiles.style.display = "none";
+
+		console.log(selectedTiles);
+
+
 		switch(mode){
 			case 1 :
-				break;
+				// valider
+				switch(editMode){
+					case 1:
+						for(let i = 0; i<map_width; i++){
+							for(let j=0; j<map_width; j++){
+								var found = false;
+								for(let tileIndex in selectedTiles){
+									var tile = selectedTiles[tileIndex];
+									if(i == (map_width - 1 - tile.x) && tile.y == j){
+										found = true;
+										tileIndex = selectedTiles.length;
+									}
+								}
+								if(!found){
+									tile_map[i][j] = [];
+								}
+							}
+						}	
+						break;
+					case 2 :
+						for(var selectedTile of selectedTiles){
+							tile_map[map_width - 1 - selectedTile.x][selectedTile.y] = [];
+						} 
+						break;
+					case 3 :
+						break;
+				};
+				regenerateFromArray(tile_map);
 			case 2 :
+				// cancel
+				drawMap(true);
 				break;
 		}
+		selectedTiles = [];
+		composition = [];
+		inEditorMode = false;
 	}
 	valider.addEventListener('click', () => {
 		validerOrCancel(1);
@@ -332,7 +517,7 @@ async function main() {
 		validerOrCancel(2);
 	});
 	
-	
+	/*
 	function moveOrEdit(mode){
 		switch(mode){
 			case 1 :
@@ -353,9 +538,11 @@ async function main() {
 	backToEdit.addEventListener('click', () => {
 		moveOrEdit(2);
 	});
-
+	*/
 
 	/* minimap drawing */
+	const drawingContext = minimap.getContext("2d");
+
 	const map_DIM = 300;
 	minimap.width = map_DIM;
 	minimap.height = map_DIM;
@@ -363,48 +550,97 @@ async function main() {
 	const roadColor = "rgb(127, 100, 100)";
 	const waterColor = "rgb(79, 202, 227)";
 	const grassColor = "rgb(154, 217, 138)";
-	const sandColor = "rgb(231, 217, 195)";
+	const sandColor = "rgb(240, 191, 70)";
+
+	const roadColorClair = "rgb(214, 199, 199)";
+	const waterColorClair = "rgb(171, 209, 217)";
+	const grassColorClair = "rgb(197, 214, 193)";
+	const sandColorClair = "rgb(240, 233, 223)";
 
 	const DIM_CELL = (map_DIM/map_width)/3;
+	const TILE_SIZE = map_DIM/map_width;
 
 	var currentScale = 1; // x1, x2, x4, x8
-	var centeredOn = {x:null, y:null};
-		
-	function drawMap(){
+	var topLeftIndex = {x:0, y:0};
 
+	/* Mapping between the tile array and the map */ 
+	function tileIndexToArrayIndex(x,y){
+		// the problems this mapping is intending to solve :
+		//	- the 3D visual isn't a direct representation of the tile array
+		// 	  instead the tiles in 3D are symetrically opposed to the tile array
+		//  - the array granularity is at the sub tiles scale (with micro cells), 
+		// 	  while manipulating the greate tile abstraction might come handy 
+		
+		var tileIndexX = (map_width - 1 - x)*3;
+		var tileIndexY = y*3;
+
+		return {x: tileIndexX,y: tileIndexY};
+	}
+
+	function drawTile(canvasX, canvasY, tileIndexX, tileIndexY, hasFoccus){
+		var tilePositionInArray = tileIndexToArrayIndex(tileIndexX, tileIndexY);
+		for(let i = 0; i < 3; i++){
+			for(let j = 0; j < 3; j++){
+
+				var cellIndexX = tilePositionInArray.x + (2 - i);
+				var cellIndexY = tilePositionInArray.y + j;
+
+				var tileCell = terrain_map[cellIndexX][cellIndexY];
+				if(hasFoccus){
+					switch(tileCell){
+						case 0:
+							drawingContext.fillStyle = waterColor;
+							break;
+						case 1:
+							drawingContext.fillStyle = sandColor;
+							break;
+						case 2:
+							drawingContext.fillStyle = grassColor;
+							break;
+						case 3 :
+							drawingContext.fillStyle = roadColor;
+							break;
+						default :
+							break;
+					}
+				}else{
+					switch(tileCell){
+						case 0:
+							drawingContext.fillStyle = waterColorClair;
+							break;
+						case 1:
+							drawingContext.fillStyle = sandColorClair;
+							break;
+						case 2:
+							drawingContext.fillStyle = grassColorClair;
+							break;
+						case 3 :
+							drawingContext.fillStyle = roadColorClair;
+							break;
+						default :
+							break;
+					}
+				}
+				drawingContext.fillRect(canvasX + i*DIM_CELL, canvasY + j*DIM_CELL, DIM_CELL, DIM_CELL);
+			}
+		}
+	}
+
+	function drawMap(colored){
 		// make use of the currentScale and the centeredOn to display 
 		// the map properly
-
-		for(let i = 0; i < map_width * 3; i++){
-			for(let j = 0; j < map_height * 3; j++){
-				var cell = terrain_map[i][j];
-				switch(cell){
-					case 0:
-						drawingContext.fillStyle = waterColor;
-						break;
-					case 1:
-						drawingContext.fillStyle = sandColor;
-						break;
-					case 2:
-						drawingContext.fillStyle = grassColor;
-						break;
-					case 3 :
-						drawingContext.fillStyle = roadColor;
-						break;
-					default :
-						break;
-				}
-				drawingContext.fillRect((map_width*3-1-i)*DIM_CELL,j*DIM_CELL,DIM_CELL,DIM_CELL);
-			}	
+		for(let i = 0; i < map_width; i++){
+			for(let j = 0; j < map_height; j++){
+				drawTile(i*TILE_SIZE,j*TILE_SIZE,i,j,colored);
+			}
 		}
 	}
 
 	window.addEventListener("resize", event => {
 		minimap.width = map_DIM;
 		minimap.height = map_DIM;
-		drawMap();
+		drawMap(true);
 	})
-	
 	
 	/*
 	for(let i =0; i < map.width; i++){
@@ -420,14 +656,12 @@ async function main() {
 	}
 	*/
 
-
 	/*
 		UI
 	*/
 	register_keyboard_action('z', () => {
 		debug_overlay.classList.toggle('hide')
 	})
-
 
 	function activate_preset_view() {
 		cam_angle_z = 1.3
@@ -444,7 +678,6 @@ async function main() {
 	/*---------------------------------------------------------------
 		Frame render
 	---------------------------------------------------------------*/
-
 	function render(){
 		const mat_projection = mat4.create()
 		const mat_view = mat4.create()
@@ -500,7 +733,7 @@ async function main() {
 
 	// generate the map 
 	generateTerrain(null)
-	drawMap()
+	drawMap(true)
 	render()
 }
 

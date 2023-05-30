@@ -16,7 +16,6 @@ class BufferData {
 		} else {
 			this.scale = 1.
 		}
-
 	}
 
 	get(x, y) {
@@ -101,7 +100,8 @@ function compute_candidates(tileset, map, candidates, x, y) {
 
 }
 
-function wfc_build_mesh(height_map) {
+function wfc_build_mesh(height_map, initialTilesArray) {
+
 	let grid_width = 20 // height_map.width
 	let grid_height = 20 // height_map.height
 
@@ -137,8 +137,8 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[2, 2, 2], [3, 3, 3], [2, 2, 2]]) // 12
 	// tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]])	// 21
 	// tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]])	// 22
-	// tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]]) // 23
-	// tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]]) // 24
+	// tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]])  // 23
+	// tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]])  // 24
 
 	// ROAD ENDS
 	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]]) // 13
@@ -152,54 +152,64 @@ function wfc_build_mesh(height_map) {
 	tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]]) // 19
 	tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]]) // 20
 
-
-
-
 	let adjacencies = []
 
 	for (let i = 0; i < tileset.length; ++i) {
 		adjacencies.push([10, 100, 1, 1, 1, 1, 1, 1, 1, 1, /*10*/  1, 1, 1, 1, 5, 5, 5, 5, 5, 5, /*20*/ 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
 	}
 
-
 	let candidates = Array.from(Array(grid_width), () => new Array(grid_height))
+	let map = null;
 
-	let map = Array.from(Array(grid_width), () => new Array(grid_height))
+	if(initialTilesArray){
+		// fill up the map with the existing tiles
+		map = initialTilesArray;
+		console.log(map);
 
-	let x = Math.floor(Math.random() * grid_width)
-	let y = Math.floor(Math.random() * grid_height)
+		// compute the map candidates 
+		for (let i = 0; i < grid_width; ++i) {
+			for (let j = 0; j < grid_height; ++j) {
 
-
-
-	// console.log(x, y)
-
-	for (let i = 0; i < grid_width; ++i) {
-		for (let j = 0; j < grid_height; ++j) {
-			if (i === 10 && j === 10) {
-				map[i][j] = [7]
-			}
-			//else if (i === 11 && j === 10) {
-			//	map[i][j] = [19]
-			//}
-			else {
-				map[i][j] = []
-			}
-
-			// map[i][j] = tileset[0]
-			// candidates[i][j] = tileset
-		}
-	}
-
-	for (let i = 0; i < grid_width; ++i) {
-		for (let j = 0; j < grid_height; ++j) {
-			if (i === 10 && j === 10) {
-				candidates[i][j] = []
-			}
-			else {
-				candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
+				// toDO : have a way to set the candidates to 0 for an empty map 
+				if (map[i][j].length != 0) {
+					candidates[i][j] = []
+				}else {
+					candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
+				}
 			}
 		}
+	}else{
+		map = Array.from(Array(grid_width), () => new Array(grid_height));
+
+		for (let i = 0; i < grid_width; ++i) {
+			for (let j = 0; j < grid_height; ++j) {
+				if (i === 10 && j === 10) {
+					map[i][j] = [7]
+				}
+				//else if (i === 11 && j === 10) {
+				//	map[i][j] = [19]
+				//}
+				else {
+					map[i][j] = []
+				}
+	
+				// map[i][j] = tileset[0]
+				// candidates[i][j] = tileset
+			}
+		}
+
+		for (let i = 0; i < grid_width; ++i) {
+			for (let j = 0; j < grid_height; ++j) {
+				if (i === 10 && j === 10) {
+					candidates[i][j] = []
+				}
+				else {
+					candidates[i][j] = compute_candidates(tileset, map, candidates, i, j)
+				}
+			}
+		}	
 	}
+
 
 	let count = 0
 	while (!check_converged(candidates)) {
@@ -281,6 +291,13 @@ function wfc_build_mesh(height_map) {
 
 		}
 
+	}
+
+	var tileMap = Array.from(Array(grid_width), () => new Array(grid_height));
+	for (let i = 0; i < grid_width; ++i) {
+		for (let j = 0; j < grid_height; ++j) {
+			tileMap[i][j] = map[i][j];
+		}
 	}
 
 	for (let i = 0; i < grid_width; ++i) {
@@ -432,14 +449,15 @@ function wfc_build_mesh(height_map) {
 		vertex_normals: normals,
 		faces: faces,
 		vertex_values: valuesCompressed,
-		map : drawMap
+		map : drawMap,
+		tile_map : tileMap
 	}
 }
 
 
-export function init_terrain(regl, resources, height_map_buffer) {
+export function init_terrain(regl, resources, height_map_buffer, initialTilesArray) {
 
-	const terrain_mesh = wfc_build_mesh(new BufferData(regl, height_map_buffer))
+	const terrain_mesh = wfc_build_mesh(new BufferData(regl, height_map_buffer), initialTilesArray)
 
 	const pipeline_draw_terrain = regl({
 		attributes: {
@@ -490,6 +508,7 @@ export function init_terrain(regl, resources, height_map_buffer) {
 
 	return {
 		terrain_actor : new TerrainActor(),
-		terrain_map : terrain_mesh.map
+		terrain_map : terrain_mesh.map,
+		tile_map : terrain_mesh.tile_map
 	};
 }
