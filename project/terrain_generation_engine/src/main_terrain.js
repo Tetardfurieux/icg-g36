@@ -683,13 +683,12 @@ async function main() {
 		const mat_view = mat4.create()
 
 		let light_position_world = [0.2, -0.3, 0.8, 1.0]
-		//let light_position_world = [1, -1, 1., 1.0]
 
 		const light_position_cam = [0, 0, 0, 0]
 
 		regl.frame((frame) => {
 			if(update_needed) {
-				update_needed = true //false  // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
+				update_needed = true  // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
 
 				mat4.perspective(mat_projection,
 					deg_to_rad * 60, // fov y
@@ -720,9 +719,6 @@ async function main() {
 				regl.clear({color: [r, g, b, 1]})
 				terrain_actor.draw(scene_info)
 			}
-
-			// Set the whole image to black
-			//regl.clear({color: [0.9, 0.9, 1., 1]})
 			
 	// 		debug_text.textContent = `
 	// Hello! Sim time is ${sim_time.toFixed(2)} s
@@ -738,4 +734,9 @@ async function main() {
 }
 
 DOM_loaded_promise.then(main)
+
+/*setInterval(() => {
+	update_needed = true
+	render()}, 500);*/
   
+ 
