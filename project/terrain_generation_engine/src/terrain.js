@@ -170,7 +170,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 		for (let i = 0; i < grid_width; ++i) {
 			for (let j = 0; j < grid_height; ++j) {
 
-				// toDO : have a way to set the candidates to 0 for an empty map 
 				if (map[i][j].length != 0) {
 					candidates[i][j] = []
 				}else {
@@ -186,15 +185,10 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 				if (i === 10 && j === 10) {
 					map[i][j] = [7]
 				}
-				//else if (i === 11 && j === 10) {
-				//	map[i][j] = [19]
-				//}
 				else {
 					map[i][j] = []
 				}
 	
-				// map[i][j] = tileset[0]
-				// candidates[i][j] = tileset
 			}
 		}
 
@@ -218,7 +212,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 			break
 		}
 		count++
-		// console.log(count)
 
 		for (let i = 0; i < grid_width; ++i) {
 			for (let j = 0; j < grid_height; ++j) {
@@ -240,9 +233,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 					// console.log(candidates[i][j].length)
 					if (candidates[i][j].length === k) {
 						let r = Math.floor(Math.random() * candidates[i][j].length)
-
-						console.log("------------------")
-						console.log(candidates[i][j], i, j)
 
 						let neighbors = []
 						if (i > 0 && map[i - 1][j].length > 0) {
@@ -277,8 +267,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 							}
 						}
 
-						console.log(weighted_candidates)
-
 						r = Math.floor(Math.random() * weighted_candidates.length)
 
 						map[i][j] = [weighted_candidates[r]]
@@ -311,10 +299,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 		}
 	}
 
-
-	// console.log("done")
-
-	// console.log(map)
 	let drawMap = Array.from(Array(3*grid_width), () => new Array(3*grid_height))
 	let values = []
 
