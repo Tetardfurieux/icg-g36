@@ -26,13 +26,16 @@ In our implementation, we chose to create a set of 3x3 tiles which we handcrafte
 We decided to implement the most complex variant of the algorithm using adjacency probabilities instead of simply collapsing the tiles at random from the remaining accepted ones.
 This allowed us to create bigger islands and bigger sea areas instead of a lot of tiny islands which made for a much less interesting terrain.
 
-To transfer the computed terrain to the shaders, we use GLSL uniforms. Due to a limitation in the GLSL version used in the course engine, we had to optimize each element of the Uniform array to hold 4 integers instead of 1 by setting each consecutive block of 4 elments [a, b, c, d] to fit in one element as $a \cdot 10^3 + b \cdot 10^2 + c \cdot 10 + d$ which allowed us to get a much bigger terrain which we decided to set to 60x60 to make the interactive mini-map easier to use.
+To transfer the computed terrain to the shaders, we use GLSL uniforms. Due to a limitation in the GLSL version used in the course engine, we had to optimize each element of the Uniform array to hold 4 integers instead of 1 by setting each consecutive block of 4 elements [a, b, c, d] to fit in one element as $a \cdot 10^3 + b \cdot 10^2 + c \cdot 10 + d$ which allowed us to get a much bigger terrain which we decided to set to 60x60 to make the interactive mini-map easier to use.
 
-TODO: shaders
+## Shaders
+Within the shaders, we access the Uniform array and dynamically assign color and height values based on the type of each tile.
 
-TODO: interactivity
+## Interactivity
 
-TODO: cycle jour/nuit
+## Day/Night cycle
+
+To implement the day/night cycle, we utilized a sine function applied to the current timestamp. This function provided us with a value ranging from 0 to 1. Subsequently, we utilized this value to determine the background color and adjust the lighting color accordingly.
 
 
 

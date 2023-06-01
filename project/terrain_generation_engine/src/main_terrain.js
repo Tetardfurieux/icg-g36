@@ -29,6 +29,7 @@ async function main() {
 
 
 	let update_needed = true
+	let day_night_cycle = false
 	{
 		// Resize canvas to fit the window, but keep it square.
 		function resize_canvas() {
@@ -97,16 +98,6 @@ async function main() {
 	let cam_target = [0, 0, 0]
 
 	function update_cam_transform() {
-		/* #TODO PG1.0 Copy camera controls
-		* Copy your solution to Task 2.2 of assignment 5.
-		Calculate the world-to-camera transformation matrix.
-		The camera orbits the scene
-		* cam_distance_base * cam_distance_factor = distance of the camera from the (0, 0, 0) point
-		* cam_angle_z - camera ray's angle around the Z axis
-		* cam_angle_y - camera ray's angle around the Y axis
-
-		* cam_target - the point we orbit around
-		*/
 		const translation = mat4.translate(mat4.create(), mat4.create(), [cam_distance_base * cam_distance_factor, 0, 0])
 		const rotation_y = mat4.rotateY(mat4.create(), mat4.create(), cam_angle_y)
 		const rotation_z = mat4.rotateZ(mat4.create(), mat4.create(), cam_angle_z)
@@ -118,8 +109,6 @@ async function main() {
 			[0, 0, 1], // up vector
 		)
 		// Store the combined transform in mat_turntable
-		// mat_turntable = A * B * ...
-		//mat4_matmul_many(mat_turntable, look_at) // edit this
 		mat4_matmul_many(mat_turntable,
 			look_at,
 			translation,
@@ -159,7 +148,6 @@ async function main() {
 		const factor_mul = (event.deltaY > 0) ? factor_mul_base : 1./factor_mul_base
 		cam_distance_factor *= factor_mul
 		cam_distance_factor = Math.max(0.1, Math.min(cam_distance_factor, 4))
-		// console.log('wheel', event.deltaY, event.deltaMode)
 		event.preventDefault() // don't scroll the page too...
 		update_cam_transform()
 		update_needed = true
@@ -213,17 +201,9 @@ async function main() {
 
 	const edit1 = document.getElementById('edit1');
 	const edit2 = document.getElementById('edit2');
-	// const edit3 = document.getElementById('edit3');
 	
 	const valider = document.getElementById('valider');
 	const cancel = document.getElementById('cancel');
-
-	// const zoomIn = document.getElementById('zoomIn');
-	// const zoomOut = document.getElementById('zoomOut');
-	// const backToEdit = document.getElementById('back_to_edit');
-	// const move = document.getElementById('move');
-
-
 
 	/* return tile index of the tile under the mouse cursor */
 	function tileAtMouseCursorIndex(mouseEvent){
@@ -248,7 +228,6 @@ async function main() {
 	function handleMinimapClick(mouseEvent){
 		
 		if(inEditorMode){
-			/* alert("map clicked in editor mode !") */
 			switch(editMode){
 				case 1 :
 				case 2 :
@@ -267,8 +246,6 @@ async function main() {
 					// pose tiles 
 					break;
 			}
-		}else{
-			/* alert("not in editor mode :(") */
 		}
 	}
 	minimap.addEventListener('click', (event) => {
@@ -281,10 +258,8 @@ async function main() {
 		if(inEditorMode){
 
 			var tileIndexPointedByMouse = tileAtMouseCursorIndex(mouseEvent)
-			// alert(`${tileIndexPointedByMouse.x}, ${tileIndexPointedByMouse.y}`);
 
 			if(tileIndex == null){
-				/* alert("you entered the canvas"); */
 				tileIndex = tileIndexPointedByMouse;
 				switch(editMode){
 					case 1:
@@ -299,7 +274,6 @@ async function main() {
 				
 			}else{
 				if(tileIndex.x != tileIndexPointedByMouse.x || tileIndex.y != tileIndexPointedByMouse.y){
-					/* alert("you are over a new tile"); */	
 
 					var isTileSelected = false;
 					if(editMode == 1 || editMode == 2){
@@ -338,40 +312,10 @@ async function main() {
 		}
 	});
 
-	/*
-	function zoomInOutMap(mode){
-		switch(mode){
-			case -1:
-				// zoom Out
-				// alert("zoom out");
-				if(currentScale < 16){
-					currentScale *= 2;
-					drawMap(true);
-				}	
-				break;
-			case 1:
-				// zoom In
-				// alert("zoom in");
-				if(currentScale > 1){
-					currentScale /= 2;
-					drawMap(true);
-				}
-				break;
-		}
-	}
-	zoomIn.addEventListener('click', () => {
-		zoomInOutMap(1);
-	});
-	zoomOut.addEventListener('click', () => {
-		zoomInOutMap(-1);
-	});
-	*/
-
 
 	var editMode = 0;
 	function edit(mode){
 		inEditorMode = true;
-		// move.style.display = "inline";
 		minimap.style.cursor = "crosshair";
 		editTools.style.display = "none";
 		validationTools.style.display = "block";
@@ -395,17 +339,10 @@ async function main() {
 	edit2.addEventListener('click', () => {
 		edit(2);
 	});
-	/*
-	edit3.addEventListener('click', () => {
-		edit(3);
-	});
-	*/
 
 	function regenerate(){
 		inEditorMode = false;
 		minimap.style.cursor = "grab";
-		// move.style.display = "none";
-		// backToEdit.style.display = "none";
 		editTools.style.display = "block";
 		validationTools.style.display = "none";
 		availableTiles.style.display = "none";
@@ -441,17 +378,9 @@ async function main() {
 			case 'r':
 				regenerate()
 				break;
-			/*
-			case 'p': 
-				if(diaporamaRunning){
-					clearInterval(intervall);
-					diaporamaRunning = false;
-				}else{
-					intervall = setInterval(regenerate, 1000);
-					diaporamaRunning = true;
-				}
+			case 'n':
+				day_night_cycle = !day_night_cycle;
 				break;
-			*/
 			case '': 
 				break;
 		}
@@ -462,8 +391,6 @@ async function main() {
 
 	function validerOrCancel(mode){
 		minimap.style.cursor = "grab";
-		// move.style.display = "none";
-		// backToEdit.style.display = "none";
 		editTools.style.display = "block";
 		validationTools.style.display = "none";
 		availableTiles.style.display = "none";
@@ -517,28 +444,6 @@ async function main() {
 		validerOrCancel(2);
 	});
 	
-	/*
-	function moveOrEdit(mode){
-		switch(mode){
-			case 1 :
-				backToEdit.style.display = "inline";
-				move.style.display = "none";
-				minimap.style.cursor = "grab";
-				break;
-			case 2 :
-				backToEdit.style.display = "none";
-				move.style.display = "inline";
-				minimap.style.cursor = "crosshair";
-				break;
-		}
-	}
-	move.addEventListener('click', () => {
-		moveOrEdit(1);
-	});
-	backToEdit.addEventListener('click', () => {
-		moveOrEdit(2);
-	});
-	*/
 
 	/* minimap drawing */
 	const drawingContext = minimap.getContext("2d");
@@ -641,20 +546,6 @@ async function main() {
 		minimap.height = map_DIM;
 		drawMap(true);
 	})
-	
-	/*
-	for(let i =0; i < map.width; i++){
-		for(let j = 0; j < map.height; j++){
-			let x = i * DIM_CELL;
-			let y = j * DIM_CELL;
-			
-			drawingContext.startPath();
-			drawingContext.fillStyle = "rgb(0, 255, 255)";
-			drawingContext.fillRect(x, y, DIM_CELL, DIM_CELL);
-			drawingContext.endPath();
-		}
-	}
-	*/
 
 	/*
 		UI
@@ -683,7 +574,6 @@ async function main() {
 		const mat_view = mat4.create()
 
 		let light_position_world = [0.2, -0.3, 0.8, 1.0]
-		//let light_position_world = [1, -1, 1., 1.0]
 
 		const light_position_cam = [0, 0, 0, 0]
 
@@ -702,23 +592,29 @@ async function main() {
 
 				// Calculate light position in camera frame
 				vec4.transformMat4(light_position_cam, light_position_world, mat_view)
+				
+				const d = new Date();
+				let time = d.getTime() / 1000.;	
 
 				const scene_info = {
 					mat_view:        mat_view,
 					mat_projection:  mat_projection,
 					light_position_cam: light_position_cam,
+					day_night: day_night_cycle,
 				}
 
-				// Set the whole image to black
-				regl.clear({color: [0.9, 0.9, 1., 1]})
+				// If we're in day/night cycle mode, clear to a color that depends on the current time
+				if(day_night_cycle){
+				let background_color =  Math.min(1, Math.max(Math.sin(time - Math.PI/2.0) + 1, 0.2));
 
+				regl.clear({color: [background_color, background_color, background_color, 1]})
+				}
+				else{
+					regl.clear({color: [0.9, 0.9, 1., 1]}) // clear to white
+				}
 				terrain_actor.draw(scene_info)
 			}
 
-	// 		debug_text.textContent = `
-	// Hello! Sim time is ${sim_time.toFixed(2)} s
-	// Camera: angle_z ${(cam_angle_z / deg_to_rad).toFixed(1)}, angle_y ${(cam_angle_y / deg_to_rad).toFixed(1)}, distance ${(cam_distance_factor*cam_distance_base).toFixed(1)}
-	// `
 		})
 	}	
 
@@ -726,6 +622,12 @@ async function main() {
 	generateTerrain(null)
 	drawMap(true)
 	render()
+
+	setInterval(() => { // update 
+		update_needed = true
+		render()
+	}, 1000/60)
+
 }
 
 DOM_loaded_promise.then(main)

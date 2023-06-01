@@ -135,10 +135,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 	tileset.push([[2, 3, 2], [3, 3, 3], [2, 3, 2]]) // 10
 	tileset.push([[2, 3, 2], [2, 3, 2], [2, 3, 2]]) // 11
 	tileset.push([[2, 2, 2], [3, 3, 3], [2, 2, 2]]) // 12
-	// tileset.push([[2, 3, 2], [3, 3, 2], [2, 2, 2]])	// 21
-	// tileset.push([[2, 3, 2], [2, 3, 3], [2, 2, 2]])	// 22
-	// tileset.push([[2, 2, 2], [3, 3, 2], [2, 3, 2]])  // 23
-	// tileset.push([[2, 2, 2], [2, 3, 3], [2, 3, 2]])  // 24
 
 	// ROAD ENDS
 	tileset.push([[2, 3, 2], [2, 3, 2], [2, 2, 2]]) // 13
@@ -230,7 +226,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 					break
 				}
 				for (let j = 0; j < grid_height; ++j) {
-					// console.log(candidates[i][j].length)
 					if (candidates[i][j].length === k) {
 						let r = Math.floor(Math.random() * candidates[i][j].length)
 
@@ -344,7 +339,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 	for(let gy = 0; gy < grid_height; gy++) {
 		for(let gx = 0; gx < grid_width; gx++) {
 			const idx = xy_to_v_index(gx, gy)
-			let elevation = height_map.get(gx, gy) - 0.5 // we put the value between 0...1 so that it could be stored in a non-float texture on older browsers/GLES3, the -0.5 brings it back to -0.5 ... 0.5
 
 			// normal as finite difference of the height map
 			// dz/dx = (h(x+dx) - h(x-dx)) / (2 dx)
@@ -354,20 +348,7 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 				1.,
 			])
 
-			/* #TODO PG1.6.1
-			Generate the displaced terrain vertex corresponding to integer grid location (gx, gy). 
-			The height (Z coordinate) of this vertex is determined by height_map.
-			If the point falls below WATER_LEVEL:
-			* it should be clamped back to WATER_LEVEL.
-			* the normal should be [0, 0, 1]
-
-			The XY coordinates are calculated so that the full grid covers the square [-0.5, 0.5]^2 in the XY plane.
-			*/
 			let z = height_map.get(gx, gy) - 0.5;
-			/*if (z < WATER_LEVEL) {
-				z = WATER_LEVEL;
-				normals[idx] = [0, 0, 1];
-			}*/
 			let va = xy_to_v_index(gx, gy);
 			let vb = xy_to_v_index(gx + 1, gy);
 			let vc = xy_to_v_index(gx, gy + 1);
@@ -375,10 +356,6 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 
 			if(drawMap[gx][gy] === 0) {
 				z = WATER_LEVEL;
-				/*vertices[va] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
-				vertices[vb] = [(gx + 1)/ grid_width - 0.5, gy / grid_height - 0.5, z];
-				vertices[vc] = [gx / grid_width - 0.5, (gy + 1) / grid_height - 0.5, z];
-				vertices[vd] = [(gx + 1)/ grid_width - 0.5, (gy + 1) / grid_height - 0.5, z];*/
 				normals[idx] = [0, 0, 1];
 			}
 			else if(drawMap[gx][gy] === 1) {
@@ -397,27 +374,18 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 				z = WATER_LEVEL;
 			}
 
-			//vertices[idx] = [gx, gy, z];
-			//if(drawMap[gx][gy] !== 0) {
 			vertices[idx] = [gx / grid_width - 0.5, gy / grid_height - 0.5, z];
-			// vertices[idx] = [gx, gy, z];
-			//}
 		}
 	}
 
 	for(let gy = 0; gy < grid_height - 1; gy++) {
 		for(let gx = 0; gx < grid_width - 1; gx++) {
-			/* #TODO PG1.6.1
-			Triangulate the grid cell whose lower lefthand corner is grid index (gx, gy).
-			You will need to create two triangles to fill each square.
-			*/
 			let va = xy_to_v_index(gx, gy);
 			let vb = xy_to_v_index(gx + 1, gy);
 			let vc = xy_to_v_index(gx, gy + 1);
 			let vd = xy_to_v_index(gx + 1, gy + 1);
 			faces.push([va, vb, vc]);
 			faces.push([vb, vd, vc]);
-			// faces.push([v1, v2, v3]) // adds a triangle on vertex indices v1, v2, v3
 		}
 	}
 
@@ -442,7 +410,7 @@ function wfc_build_mesh(height_map, initialTilesArray) {
 export function init_terrain(regl, resources, height_map_buffer, initialTilesArray) {
 
 	const terrain_mesh = wfc_build_mesh(new BufferData(regl, height_map_buffer), initialTilesArray)
-
+	let day_night_b = false;
 	const pipeline_draw_terrain = regl({
 		attributes: {
 			position: terrain_mesh.vertex_positions,
@@ -455,6 +423,10 @@ export function init_terrain(regl, resources, height_map_buffer, initialTilesArr
 
 			light_position: regl.prop('light_position'),
 			values: terrain_mesh.vertex_values,
+			times: () => {
+				if(day_night_b) return updateDayNightCycle()
+				else return 1.0
+			},
 		},
 		elements: terrain_mesh.faces,
 
@@ -471,13 +443,14 @@ export function init_terrain(regl, resources, height_map_buffer, initialTilesArr
 			this.mat_model_to_world = mat4.create()
 		}
 
-		draw({mat_projection, mat_view, light_position_cam}) {
+		draw({mat_projection, mat_view, light_position_cam, day_night}) {
 			mat4_matmul_many(this.mat_model_view, mat_view, this.mat_model_to_world)
 			mat4_matmul_many(this.mat_mvp, mat_projection, this.mat_model_view)
 
 			mat3.fromMat4(this.mat_normals, this.mat_model_view)
 			mat3.transpose(this.mat_normals, this.mat_normals)
 			mat3.invert(this.mat_normals, this.mat_normals)
+			day_night_b = day_night
 
 			pipeline_draw_terrain({
 				mat_mvp: this.mat_mvp,
@@ -494,4 +467,20 @@ export function init_terrain(regl, resources, height_map_buffer, initialTilesArr
 		terrain_map : terrain_mesh.map,
 		tile_map : terrain_mesh.tile_map
 	};
+
+	
 }
+
+/*---------------------------------------------------------------
+		Day Night Cycle
+	---------------------------------------------------------------*/
+function updateDayNightCycle(day) {
+	if(day) return 1.0;
+    var currentTime = new Date();
+    var seconds = currentTime.getTime() / 1000;
+	let r = Math.min(1, Math.max(Math.sin(seconds - Math.PI/2.0) + 1, 0.2));
+
+    return r;
+}
+
+
