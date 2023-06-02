@@ -32,6 +32,7 @@ To transfer the computed terrain to the shaders, we use GLSL uniforms. Due to a 
 Within the shaders, we access the Uniform array and dynamically assign color and height values based on the type of each tile.
 
 ## Interactivity
+Our project includes a mini map that provides a 2d overview of the generated terrain. The map comes together with 2 edit tools in order to enable users to modify and interact with the map. The edit tool 1, enables to keep tiles of the map that are interesting and after selection validation regenerates based on the selected tiles. The edit tool 2, enable to erase tiles and tries to replace them with new tiles.
 
 ## Day/Night cycle
 
