@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>ICG: Procedural Terrain </title>
+	<!-- the engine basis author is Krzysztof Lis -->
+	<meta name="author" content="Antoine ROGER, Baptiste COPROS, Benoit MORAWIEC">
+
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="minimap.css">
+</head>
+<body>
+
+<div id="debug-overlay">
+	<p>
+		ICG Project Group 36 : "Terrain Generation" <br/>
+		<br/>
+		⁙⁙ mouse: drag to rotate, shift+drag to move <br/>
+		⁙⁙ scroll to zoom <br/>
+		<br/>
+		⁙⁙ show/hide <strong class="keyboard">z</strong> <br/>
+		⁙⁙ show/hide map <strong class="keyboard">m</strong>
+		<br/>
+		⁙⁙ generate new terrain <strong class="keyboard">r</strong>
+		<br/>
+		⁙⁙ on/off day/night cycle <strong class="keyboard">n</strong>
+	</p>
+	<br/>
+	<p id="view-options">
+		<span id="btn-preset-view" class="button">Reset Camera <strong class="keyboard">1</strong></span>
+	</p>
+	<p> 
+		<!--
+		<span id="btn-preset-view" class="button">Pregenerated Terrain <strong class="keyboard">2</strong></span>
+		<span id="btn-preset-view" class="button">Pregenerated Terrain <strong class="keyboard">3</strong></span>
+		-->
+	</p>
+	<pre id="debug-text"></pre>
+</div>
+
+
+<div id="minimap">
+	<p> Terrain minimap </p>
+	<canvas id="map_visual"></canvas>
+	<div class="tools">
+		<div id="editTools">
+			<img id="edit1" alt="edit_mode1" src="ressources/edit mode 1.svg" />
+			<img id="edit2" alt="edit_mode2" src="ressources/edit mode 2.svg" />
+		</div>
+		<div id="validerOrCancel"> 
+			<img id="valider" alt="valider" src="ressources/valider.svg" />
+			<img id="cancel" alt="cancel" src="ressources/cancel.svg" />
+		</div>
+	</div>
+	<div id="availableTiles"> 
+		<p> The available tiles </p>
+	</div>
+</div>
+
+<script src="src/main_terrain.js" type="module"></script>
+
+</body>
+</html>

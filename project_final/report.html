@@ -67,17 +67,26 @@
         {
             color : green;
         }
-        .column {
-	        float: left;
-	        width: 40%;
-	        padding: 5px;
+        .row
+        {
+            margin-top : 0;
+            width : 100%;
+            display : flex;
+            flex-direction : row;
+            align-items : center;
+            justify-content: center;
         }
-  
-  /* Clear floats after image containers */
-        .row::after {
-	        content: "";
-	        clear: both;
-	        display: table;
+        .column
+        {
+
+            min-width : 200px;
+            width : 20%;
+            margin : 0.5%;
+            margin-top : 0;
+        }
+        .column img
+        {
+            width : 100%;
         }
     </style>
 </head>
@@ -144,10 +153,10 @@ Due to a limitation in the GLSL version used in the course engine, we had to opt
     <h3> Tool 1</h3>
     <div class="row">
         <div class="column">
-          <img src="visuals/Minimaptool1.PNG" alt="tool1" style="width:100%">
+            <img src="visuals/Minimaptool1.PNG" alt="tool1" style="width:100%">
         </div>
         <div class="column">
-          <img src="visuals/Minimapposttool1.PNG" alt="post1" style="width:100%">
+            <img src="visuals/Minimapposttool1.PNG" alt="post1" style="width:100%">
         </div>
     </div>
 
@@ -155,7 +164,7 @@ Due to a limitation in the GLSL version used in the course engine, we had to opt
     <div class="row">
         <div class="column">
             <img src="visuals/tool2.PNG" alt="tool2" style="width:100%">
-          </div>
+        </div>
         <div class="column">
             <img src="visuals/posttool2.PNG" alt="post2" style="width:100%">
         </div>
