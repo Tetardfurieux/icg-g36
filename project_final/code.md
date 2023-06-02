@@ -471,13 +471,473 @@ else {
 }
 ```
 
-## Mini Map
+## Mini Map HTML
 
-TODO
+The Html : 
 
-## Interactivity
+```html
+<div id="minimap">
+	<p> Terrain minimap </p>
+	<canvas id="map_visual"></canvas>
+	<div class="tools">
+		<div id="editTools">
+			<img id="edit1" alt="edit_mode1" src="ressources/edit mode 1.svg" />
+			<img id="edit2" alt="edit_mode2" src="ressources/edit mode 2.svg" />
+		</div>
+		<div id="validerOrCancel"> 
+			<img id="valider" alt="valider" src="ressources/valider.svg" />
+			<img id="cancel" alt="cancel" src="ressources/cancel.svg" />
+		</div>
+	</div>
+	<div id="availableTiles"> 
+		<p> The available tiles </p>
+	</div>
+</div>
+```
 
-TODO
+The css : 
+
+```css
+/*
+    This file contains the css code for the minimap
+*/
+#minimap
+{
+    z-index : 2;
+    position : absolute; 
+    top : 10px;
+    right : 10px;
+    
+    width : fit-content;
+    height: fit-content;
+
+    color : white;
+    background-color: rgb(114, 114, 127);
+    border : 3px solid rgb(17, 17, 17);
+    border-radius: 10px;
+    padding : 10px;
+
+    cursor: move;
+}
+
+#minimap p
+{
+    color : white;
+    text-align: center;
+    margin : 0px;
+    margin-bottom: 5px;
+}
+
+#map_visual
+{
+    width : 300px;
+    height : 300px;
+
+    border : 3px solid rgb(17, 17, 17);
+    background-color: white;
+    cursor : grab;
+}
+
+.tools
+{
+    width : 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items : center;
+}
+
+#zoomTools, #editTools, #validerOrCancel
+{
+    width : wrap;
+}
+#validerOrCancel
+{
+    display: none;
+}
+
+#zoomIn, #zoomOut, #edit1, #edit2, #edit3, #valider, #cancel, #back_to_edit, #move
+{
+    cursor : pointer;
+    height : 45px;
+    transition : transform 200ms;
+    &:hover
+    {
+        transform : scale(1.2);
+        transition : 50ms;
+    }
+    &:active
+    {
+    transform : scale(1);
+    }
+}
+#availableTiles
+{
+    display : none;
+    margin-block : 1em;
+    border : 3px solid rgb(17, 17, 17);
+}
+#move, #back_to_edit
+{
+    display : none;
+    margin-left : 10px;
+}
+```
+
+## Minimap Interactivity
+
+```js
+const map = document.getElementById('minimap');
+
+var isMinimapVisible = true;
+
+const minimap = document.getElementById('map_visual');
+
+const validationTools = document.getElementById("validerOrCancel");
+const availableTiles = document.getElementById("availableTiles");
+
+const edit1 = document.getElementById('edit1');
+const edit2 = document.getElementById('edit2');
+	
+const valider = document.getElementById('valider');
+const cancel = document.getElementById('cancel');
+
+/* return tile index of the tile under the mouse cursor */
+function tileAtMouseCursorIndex(mouseEvent){
+	let boundingRect = minimap.getBoundingClientRect();
+	let xWithinCanvas = mouseEvent.pageX - boundingRect.left;
+	let yWithinCanvas = mouseEvent.pageY - boundingRect.top;
+
+	return {
+		x: Math.floor(xWithinCanvas/ map_DIM * map_width),
+		y: Math.floor(yWithinCanvas / map_DIM * map_height)
+	};
+}
+
+/* FSM state variables */
+var inEditorMode = false;
+
+/* handle clicks on the map */
+var selectedTiles = []; // for mode 1 and 2  
+var composition = []; // for mode 3
+
+	
+function handleMinimapClick(mouseEvent){
+	if(inEditorMode){
+		switch(editMode){
+			case 1 :
+			case 2 :
+				// select tiles to conserve / remove 
+				var selectedTile = tileAtMouseCursorIndex(mouseEvent);
+				for(let index in selectedTiles){
+					var tileIndex = selectedTiles[index];
+					if(tileIndex.x == selectedTile.x && tileIndex.y == selectedTile.y){
+						selectedTiles.splice(index,1);
+						return;
+					}
+				}
+				selectedTiles.push(selectedTile);
+				break;										
+			case 3 :
+				// pose tiles 
+				break;
+		}
+	}
+}
+minimap.addEventListener('click', (event) => {
+	handleMinimapClick(event);
+});
+	
+/* handle mouse move on the map */
+var tileIndex = null;
+minimap.addEventListener("mousemove", mouseEvent => {
+	if(inEditorMode){
+		var tileIndexPointedByMouse = tileAtMouseCursorIndex(mouseEvent)
+		if(tileIndex == null){
+			tileIndex = tileIndexPointedByMouse;
+			switch(editMode){
+				case 1:
+					drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,true);
+					break;
+				case 2:
+					drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,false);
+					break;
+				case 3 : 
+					break;
+			}	
+		}else{
+			if(tileIndex.x != tileIndexPointedByMouse.x || tileIndex.y != tileIndexPointedByMouse.y){
+				var isTileSelected = false;
+				if(editMode == 1 || editMode == 2){
+					for(let tile of selectedTiles){
+						if(tile.x == tileIndex.x && tile.y == tileIndex.y){
+							isTileSelected = true;
+							break;
+						}
+					}
+				}
+
+				switch(editMode){
+					case 1:
+						drawTile(tileIndex.x*TILE_SIZE,tileIndex.y*TILE_SIZE,tileIndex.x,tileIndex.y,isTileSelected);
+						break;
+					case 2:
+						drawTile(tileIndex.x*TILE_SIZE,tileIndex.y*TILE_SIZE,tileIndex.x,tileIndex.y,!isTileSelected);
+						break;
+					case 3 : 
+						break;
+				}
+
+				tileIndex = tileIndexPointedByMouse;
+				switch(editMode){
+					case 1:
+						drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,true);
+						break;
+					case 2:
+						drawTile(tileIndexPointedByMouse.x*TILE_SIZE,tileIndexPointedByMouse.y*TILE_SIZE,tileIndexPointedByMouse.x,tileIndexPointedByMouse.y,false);
+						break;
+					case 3 : 
+						break;
+				}
+			}
+		}
+	}
+});
+
+
+var editMode = 0;
+function edit(mode){
+	inEditorMode = true;
+	minimap.style.cursor = "crosshair";
+	editTools.style.display = "none";
+	validationTools.style.display = "block";
+	switch(mode){
+		case 1 :
+			editMode = 1;
+			drawMap(false);
+			break;
+		case 2 : 
+			editMode = 2;
+			break;
+		case 3:
+			editMode = 3;
+			availableTiles.style.display = "block";
+			break;
+	}
+}
+edit1.addEventListener('click', () => {
+	edit(1);
+});
+edit2.addEventListener('click', () => {
+	edit(2);
+});
+
+function regenerate(){
+	inEditorMode = false;
+	minimap.style.cursor = "grab";
+	editTools.style.display = "block";
+	validationTools.style.display = "none";
+	availableTiles.style.display = "none";
+	selectedTiles = [];
+
+	generateTerrain(null);
+	update_needed=true;
+	render();
+	drawMap(true);
+}
+
+function regenerateFromArray(initTileArray){
+	generateTerrain(initTileArray);
+	update_needed=true;
+	render();
+	drawMap(true);
+}
+	
+var intervall = null;
+var diaporamaRunning = false;
+
+function keyPressAction(event){
+	switch(event.key){
+		// minimap hide / display 
+		case 'm':
+			if(isMinimapVisible){
+				map.style.display = "none";
+			}else{
+				map.style.display = "block";
+			}
+			isMinimapVisible = !isMinimapVisible;
+			break;
+		case 'r':
+			regenerate()
+			break;
+		case 'n':
+			day_night_cycle = !day_night_cycle;
+			break;
+		case '': 
+			break;
+	}
+}
+document.addEventListener("keypress", event => {
+	keyPressAction(event);
+})
+
+function validerOrCancel(mode){
+	minimap.style.cursor = "grab";
+	editTools.style.display = "block";
+	validationTools.style.display = "none";
+	availableTiles.style.display = "none";
+
+	console.log(selectedTiles);
+
+
+	switch(mode){
+		case 1 :
+			// valider
+			switch(editMode){
+				case 1:
+					for(let i = 0; i<map_width; i++){
+						for(let j=0; j<map_width; j++){
+							var found = false;
+							for(let tileIndex in selectedTiles){
+								var tile = selectedTiles[tileIndex];
+								if(i == (map_width - 1 - tile.x) && tile.y == j){
+									found = true;
+									tileIndex = selectedTiles.length;
+								}
+							}
+							if(!found){
+								tile_map[i][j] = [];
+							}
+						}
+					}	
+					break;
+				case 2 :
+					for(var selectedTile of selectedTiles){
+						tile_map[map_width - 1 - selectedTile.x][selectedTile.y] = [];
+					} 
+					break;
+				case 3 :
+					break;
+				};
+			regenerateFromArray(tile_map);
+		case 2 :
+			// cancel
+			drawMap(true);
+			break;
+	}
+	selectedTiles = [];
+	composition = [];
+	inEditorMode = false;
+}
+valider.addEventListener('click', () => {
+	validerOrCancel(1);
+});
+cancel.addEventListener('click', () => {
+	validerOrCancel(2);
+});
+	
+
+/* minimap drawing */
+const drawingContext = minimap.getContext("2d");
+
+const map_DIM = 300;
+minimap.width = map_DIM;
+minimap.height = map_DIM;
+
+const roadColor = "rgb(127, 100, 100)";
+const waterColor = "rgb(79, 202, 227)";
+const grassColor = "rgb(154, 217, 138)";
+const sandColor = "rgb(240, 191, 70)";
+
+const roadColorClair = "rgb(214, 199, 199)";
+const waterColorClair = "rgb(171, 209, 217)";
+const grassColorClair = "rgb(197, 214, 193)";
+const sandColorClair = "rgb(240, 233, 223)";
+
+const DIM_CELL = (map_DIM/map_width)/3;
+const TILE_SIZE = map_DIM/map_width;
+
+var currentScale = 1; // x1, x2, x4, x8
+var topLeftIndex = {x:0, y:0};
+
+/* Mapping between the tile array and the map */ 
+function tileIndexToArrayIndex(x,y){
+	// the problems this mapping is intending to solve :
+	//	- the 3D visual isn't a direct representation of the tile array
+	// 	  instead the tiles in 3D are symetrically opposed to the tile array
+	//  - the array granularity is at the sub tiles scale (with micro cells), 
+	// 	  while manipulating the greate tile abstraction might come handy 
+		
+	var tileIndexX = (map_width - 1 - x)*3;
+	var tileIndexY = y*3;
+
+	return {x: tileIndexX,y: tileIndexY};
+}
+
+function drawTile(canvasX, canvasY, tileIndexX, tileIndexY, hasFoccus){
+	var tilePositionInArray = tileIndexToArrayIndex(tileIndexX, tileIndexY);
+	for(let i = 0; i < 3; i++){
+		for(let j = 0; j < 3; j++){
+			var cellIndexX = tilePositionInArray.x + (2 - i);
+			var cellIndexY = tilePositionInArray.y + j;
+
+			var tileCell = terrain_map[cellIndexX][cellIndexY];
+			if(hasFoccus){
+				switch(tileCell){
+					case 0:
+						drawingContext.fillStyle = waterColor;
+						break;
+					case 1:
+						drawingContext.fillStyle = sandColor;
+						break;
+					case 2:
+						drawingContext.fillStyle = grassColor;
+						break;
+					case 3 :
+						drawingContext.fillStyle = roadColor;
+						break;
+					default :
+						break;
+				}
+			}else{
+				switch(tileCell){
+					case 0:
+						drawingContext.fillStyle = waterColorClair;
+						break;
+					case 1:
+						drawingContext.fillStyle = sandColorClair;
+						break;
+					case 2:
+						drawingContext.fillStyle = grassColorClair;
+						break;
+					case 3 :
+						drawingContext.fillStyle = roadColorClair;
+						break;
+					default :
+						break;
+				}
+			}
+			drawingContext.fillRect(canvasX + i*DIM_CELL, canvasY + j*DIM_CELL, DIM_CELL, DIM_CELL);
+		}
+	}
+}
+
+function drawMap(colored){
+	// make use of the currentScale and the centeredOn to display 
+	// the map properly
+	for(let i = 0; i < map_width; i++){
+		for(let j = 0; j < map_height; j++){
+			drawTile(i*TILE_SIZE,j*TILE_SIZE,i,j,colored);
+		}
+	}
+}
+
+window.addEventListener("resize", event => {
+	minimap.width = map_DIM;
+	minimap.height = map_DIM;
+	drawMap(true);
+})
+```
 
 ## Day/Night cycle
 
