@@ -67,6 +67,18 @@
         {
             color : green;
         }
+        .column {
+	        float: left;
+	        width: 40%;
+	        padding: 5px;
+        }
+  
+  /* Clear floats after image containers */
+        .row::after {
+	        content: "";
+	        clear: both;
+	        display: table;
+        }
     </style>
 </head>
 <body>
@@ -126,22 +138,30 @@ Due to a limitation in the GLSL version used in the course engine, we had to opt
     <p>To implement the day/night cycle, we utilized a sine function applied to the current timestamp. This function provided us with a value ranging from 0 to 1. Subsequently, we utilized this value to determine the background color and adjust the lighting color accordingly.</p>
     
     <h2> Results </h2>
-    <img alt="terrain-generation" src="visuals/Minimaptool1.PNG" style="width:500px;height:600px;"/>
-    <img alt="terrain-generation" src="visuals/Minimaptool2.jpg" style="width:500px;height:600px;"/>
-    <img alt="terrain-generation" src="visuals/Minimap.jpg" style="width:500px;height:600px;"/>
-    <img alt="terrain-generation" src="visuals/Minimapposttool1.PNG" style="width:500px;height:600px;"/>
+
     <img alt="terrain-generation" src="visuals/View1.PNG"/>
 
+    <h3> Tool 1</h3>
     <div class="row">
         <div class="column">
           <img src="visuals/Minimaptool1.PNG" alt="tool1" style="width:100%">
         </div>
         <div class="column">
-          <img src="visuals/Minimapposttool1.PNG" alt="Forest" style="width:100%">
+          <img src="visuals/Minimapposttool1.PNG" alt="post1" style="width:100%">
         </div>
     </div>
 
-    <video width="800" height="800" autoplay muted>
+    <h3> Tool 2</h3>
+    <div class="row">
+        <div class="column">
+            <img src="visuals/tool2.PNG" alt="tool2" style="width:100%">
+          </div>
+        <div class="column">
+            <img src="visuals/posttool2.PNG" alt="post2" style="width:100%">
+        </div>
+    </div>
+
+    <video width="800" height="400" controls>
         <source src="visuals/final.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
