@@ -1,0 +1,529 @@
+# Week 2: Ray-tracing
+
+`Raster Image` 2D array of pixels 
+> Pixel = short for *picture element*
+
+Light Transport Assumptions
+- Geometric optics: Light propagates along rays, not waves  
+    -> no diffraction, no interference, no polarization
+- RGB approximation: Approximate light spectrum by discrete RGB wavelengths  
+    -> no dispersion, no fluorescence
+- No participating media: Light travels along straight rays through vacuum  
+    -> no atmospheric scattering, no gravity effects
+- Superposition: Simply add multiple light contributions  
+    -> No non-linearly reflecting materials
+
+## Basic Ray Tracing Pipeline
+
+Ray generation  <-  
+    v            |  
+Ray intersection |  
+    v            |  
+Lighting        >-  
+
+```js
+void raytrace()
+{
+    for (int x=0; x<width; ++x)
+    {
+        for (int y=0; y<height; ++y)
+        {
+            // generate primary ray through pixel (x,y)
+            ray = primary_ray(x,y);
+
+            // determine color through (recursive!) trace function
+            color[x,y] = trace(ray);
+        }
+    }
+}
+```
+## Ray-Surface Intersections
+
+    r(t) = o + td
+
+$x^Ty = cos(\theta)||x|| ||y||$
+=> $\theta = acos(\frac{x^Ty}{||x|| ||y||})$
+
+Unit sphere
+$(\phi, \theta) -> c + r(cos \phi cos \theta, sin \phi cos \theta, sin \theta)$ 
+
+### Ray-sphere Intersection  
+
+$o + td = c + r(cos \phi cos \theta, sin \phi cos \theta, sin \theta)$  
+which we have to solve for t, $\phi$ and $\theta$  
+> Trigonometric functions make this equation nonlinear and complicated!
+
+**2nd try**
+
+||x - c|| - r = 0  
+||o + td - c|| - r = 0  
+and solve for t  
+> Much easier and more efficient!
+
+### Ray-Plane Intersection
+
+$n^T(x - c) = 0$  
+Using $d = n^Tc$  
+$n^Tx - d = 0$
+
+$n^T(o + td) - d = 0$
+
+---
+
+# Week 3: Lighting
+
+## Surface Reflectance
+
+> How much light is leaving point x in direction $w_{out}$ ?
+
+Collect incoming light $L_in$ from all directions $w_{in} \in \Omega$  
+$L_{out}(w_out) = \int_\Omega f(w_{in}, w_{out}) L_{in}(w_{in}) cos(\theta_{in}) dw_{in}$
+
+![](1.svg)
+
+## Bidirectional Reflectance Distribution Function
+
+> How much light coming in from direction $w_{in}$ is reflected out in direction $w_{out}$ ?
+
+Determined by the object's BRDF  
+-> General description of an object's material
+
+## Ray-tracing approximations
+
+![](2.png)
+
+Ray Tracing approximates integral by three directions
+- directions toward light sources, directions of perfect reflection and perfect refraction
+
+Phong Lighting approximates BRDF by three components
+- ambient light, diffuse reflection, specular reflection
+- Phong Lighting handles direct, local illumination only
+
+### Phong Lighting Model
+
+Ambient lighting
+- approximate global light transport / exchange
+- uniform in, uniform out
+
+Diffuse lighting
+- dull / mat surfaces
+- directed in, uniform out
+
+Specular lighting
+- shiny surfaces
+- directed in, directed out
+
+`Ambient Light` $I = I_a m_a$  
+Ia:ambient light intensity in the scene  
+ma: material’s ambient reflection coefficient
+
+
+`Diffuse (Lambertian) Reflection` $I = I_l m_d cos \theta = I_l m_d (n \cdot l)$   
+Il: intensity of light source l  
+md: material's diffuse reflection coefficient  
+n and l normalized  
+no illumination if $n \cdot l < 0$
+
+- Intensity inversely proportional to illuminated area
+- Illuminated area inversely proportional to
+- Therefore intensity proportional to 
+
+`Specular Reflection` $I = I_l m_s cos^s(\alpha) = I_l m_s (r \cdot v)$  
+Il: intensity of light source l  
+ms: material's specular reflection coefficient  
+all directions normalized
+no illumination if $n \cdot l < 0$ or $r \cdot v < 0$
+s: cosine exponent controls shininess
+
+$r = l + 2s$  
+$s = -l + n (n \cdot l)$  
+$r = 2n (n \cdot l) - l$
+
+### Blinn-Phong Model (better and simpler)
+
+`Half-way vector`
+$h = \frac{l + v}{||l + v||}$
+
+`Specular component`
+$I = I_l m_s (n \cdot h)^s$
+
+## Shadows
+
+Discard diffuse and specular contribution if light is blocked by another object.
+
+$I = I_a m_a + \sum_l I_l \cdot shadow(x, x_l) \cdot (m_d (n \cdot l_l) + m_s (r_l \cdot v)^s)$
+
+> Floating point errors might lead to erroneous self-shadowing (shadow acne).  
+> Discard intersection points of the shadow ray that are too close to the ray origin (the point on the sphere that we want to test).
+
+## Recursive Ray-tracing
+
+$w_{out} = (I - 2nn^T) w_{in}$
+
+`Snell's law` $n_1 sin \theta_1 = n_2 sin \theta_2$
+
+Which light paths can a standard recursive ray-tracer handle?  
+Only E[S*](D|G)L
+
+# Week 4: Rendering Pipeline
+
+![](3.svg)
+
+Shading
+- flat (constant)
+- per-vertex (Gouraud)
+- per-fragment (Phong)
+
+`OpenGl` Computer graphics rendering API 
+
+## Transformations
+
+`2D translation` $(x, y) => (x + t_x, y + t_y)$  
+`2D scaling` $(x, y) => (s_x \cdot x, s_y \cdot y)$  
+`2D rotation` $(x, y) => (r cos(\phi + \theta), r sin(\phi + \theta)) 
+= \begin{pmatrix}
+cos \theta & -sin \theta\\
+sin \theta & cos \theta
+\end{pmatrix} \cdot
+\begin{pmatrix}
+x \\ y
+\end{pmatrix}
+$  
+
+
+How to rotate/scale around object center?
+1. Translate center to origin
+2. Scale object
+3. Rotate object
+4. Translate center back
+
+> How to efficiently combine several transformations?  
+
+Represent transformations as matrices!
+
+> Every linear transformation $L:\mathbb{R}^n \rightarrow \mathbb{R}^n$ can be
+written as a unique (n x n) matrix L whose columns are the images of the basis vectors {e_1, ..., e_n}
+
+$L(x) = L(x_1e_1 + x_2e_2 + ... + x_ne_n)$
+
+`Linear transformations` preserve the origin  
+=> Translation is not a linear mapping, it is an `affine transformation` (linear + translation)
+
+$(x, y) \rightarrow 
+\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix}
+\cdot (x, y) + (t_x, t_y) = Lx + t$
+
+> How to represent translations as matrices?
+
+Extend cartesian coordinates (x,y) to homogeneous coordinates (x,y,w)  
+- Points are represented by $(x,y,1)^T$
+- Vectors are represented by $(x,y,0)^T$
+
+$\begin{pmatrix}
+1 & 0 & a \\
+0 & 1 & b \\
+0 & 0 & 1
+\end{pmatrix}$
+
+Matrix representation of arbitrary affine transformation   
+$\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix}
+\cdot (x, y) + (t_x, t_y)
+\leftrightarrow
+\begin{pmatrix}
+a & b & t_x \\
+c & d & t_y \\
+0 & 0 & 1
+\end{pmatrix}
+\cdot (x, y, 1)$
+
+Summary
+![](3.png)
+
+> Concatenate transformations by matrix multiplication 
+
+A matrix M is `orthogonal` iff…
+- its columns are orthonormal vectors
+- its rows are orthonormal vectors
+- its inverse is its transposed: $M^{-1} = M^T$
+
+
+Orthogonal matrices / mappings…
+- preserve angles and lengths
+- can only be rotations or reflections
+- have determinant +1 or -1
+
+## Rotation around x/y/z axes
+
+Can we compose any 3D rotation from rotations around the axes $R_x, R_y, R_z$ ?  
+=> `Euler angles`
+
+Problem: `Gimbal lock` $\beta = 90^o$ => $\alpha$ and $\gamma$ control the same direction
+
+Solution: `Rodrigues Formula`  
+Rotation by angle $\theta$ arount normalized axis a
+
+![](4.png)
+
+## Transformation Pipeline
+
+`Model coordinates` local coordinate system for each model
+`World coordinates` one global coordinate system
+`Camera / eye coordinates` world transformed to standard camera
+
+
+### View Transformation
+- setup extrinsic camera parameters: position and orientation
+
+        Transform scene to standard camera
+        - Camera/eye location (0,0,0)
+        - Viewing direction (0,0,-1)
+        - Up direction (0,1,0) 
+        - Right direction (1,0,0)
+
+### Projection Transformation
+- setup intrinsic camera parameters: opening angle and depth range
+
+        - A mapping from 3D space to a planar 2D image
+        - Parallel or perspective projection
+        - Transforms viewing volume to normalized device coordinates $[-1,1]^3$ 
+
+`Orthographic Projection`  
+Orthogonal projection onto xy-plane
+
+$
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{pmatrix}
+$
+- xy-coordinates do not change
+- remove z-coordinate
+- keep w-coordinate
+
+`Perspective Projection`
+Center of projection (0,0,0)  
+Image plane at z = -d
+![](5.png)
+
+`Frustum Mapping` cut outside image boundaries
+![](6.png)
+
+### Viewport Transformation
+- setup image parameters/resolution: width and height
+
+Simple scaling of normalized device coordinates to window pixel coordinates   
+$
+\begin{pmatrix}
+w/2 & 0 & 0 & w/2 + l \\
+0 & h/2 & 0 & h/2 + b \\
+0 & 0 & 1/2 & 1/2 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+$
+
+# Week 5: Meshes
+
+`Barycentric coordinates` Affine combination of 2 points  
+$x = \alpha A + \beta B$ with $\alpha + \beta = 1$
+
+`Convex combination` same with $\alpha, \beta \geq 0$  
+-> Inside of a triangle for 3 dimensions
+
+## Triangle Meshes
+
+`Valence` number of edges that are incident to the vertex
+
+Triangle meshes:  
+F ~= 2V  
+E ~= 3V  
+Average valence 6
+
+Quad meshes:  
+F ~= V  
+E ~= 2V  
+Average valence 4
+
+Affine transformations preserve affine combinations  
+=> Triangles are transformed to triangles
+
+`Triangle normal`
+$n(T) = \frac{(b - a) \times (c - a)}{||(b - a) \times (c - a)||}$
+
+`Vertex normal`  
+Average of incident's triangles' normals  
+Weighted by area or opening angle $w(T_i)$
+
+`Clipping` removes everything outside the viewing frustum
+
+## Rasterization
+
+### Line Rasterization
+
+Discretize line from $(x_0, y_0)$ to $(x_1, y_1)$ to pixel grid
+
+**Bresenham Algorithm**
+```js
+Δx  = x1-x0;
+Δy  = y1-y0;
+d   = 2*Δy - Δx;
+ΔE  = 2*Δy;
+ΔNE = 2*(Δy - Δx);
+
+set_pixel(x0, y0);
+
+for (x = x0, y = y0; x <= x1;)
+{
+    if (d <= 0) { d += ΔE;  ++x;      }
+    else        { d += ΔNE; ++x; ++y; }
+    set_pixel(x, y);
+}
+```
+$+$ only integer arithmetic -> efficient
+
+### Triangle Rasterization
+
+Compute horizontal spans in each scanline  
+-> Compute the intersections with triangle edges, fill all pixels inbetween
+
+### Shading
+
+Flat Shading
+- Compute lighting per face
+- Facetted appearance
+
+Gouraud Shading
+- Compute lighting per vertex
+- Linear interpolation of colors
+- Might loose small highlights
+
+Phong Shading
+- Linear interpolation of vertex normals
+- Compute lighting per pixel
+- Captures small highlights
+
+`Z-Buffer` store current minimum z-value for each pixel   
+-> Weird glitches when planes overlap
+
+# Week 6: Textures
+
+Textures allow us to model many surface properties:
+
+- material (diffuse + specular colors/coefficients)
+- normal vector (normal mapping, bump mapping)
+- geometry (displacement mapping)
+- opacity (alpha mapping)
+- reflection/illumination (environment mapping)
+
+> Linear interpolation in world coordinates yields nonlinear interpolation in screen coordinates!
+
+**Solution**: Interpolate texture coordinates by barycentric coordinates in 3D object space
+
+## Texture Interpolation
+
+### Magnification
+
+Round to nearest
+
+Bilinear interpolation of neighboring texture pixels
+
+```js
+color = (1-s)*(1-t)*tex[6,3] + (1-s)*t*tex[6,4]
+           s*(1-t)*tex[7,3] +     s*t*tex[7,4];
+```
+
+### Minification
+
+Point sampling is the wrong model
+- Texture minification leads to aliasing
+
+Integrate over image pixel’s area in texture space
+- Approximated by an ellipse
+- Elliptically weighted averaging (`EWA filtering`)
+
+Approximate EWA filtering by
+- mip-mapping
+- anisotropic texture filtering
+
+`Mip-Mapping`
+
+Store texture at multiple levels-of-detail
+- MIP means “multum in parvo”: many in a small space.
+- Precompute down-scaled versions of texture image
+
+Use lower-resolution versions when far from camera
+- OpenGL picks the most suitable image resolution for each
+- per-pixel texture lookup based on pixel’s depth value
+
+### Environment Maps
+
+Cube Environment Maps have less distorsion than Spherical ones but require storing 6 images
+
+### Bump Maps vs Normal Maps
+
+Bump mapping
+- Perturb normal based on height field texture
+- Tangents and bitangents can be approximated in pixel shader (see here)
+- Have to store one channel only
+
+Normal mapping
+- Store normal perturbation in RGB texture (need three channels)
+- Tangents and bitangents can be approximated in pixel shader (see here)
+- Accurate reproduction of normals
+- Generally preferred, unless memory is tight
+
+### Normal Maps vs Displacement Maps
+
+Normal mapping
+- Don’t change geometry, only change normals based on texture
+- Can be performed in pixel shader
+- Silhouette still looks wrong
+
+Displacement mapping
+- Displace vertices based on offset stored in texture
+- Compute normal vectors of displaced surface
+- Performed in geometry shader or tesselation shader - not supported by WebGL!
+- Silhouette looks ok, but much more expensive to compute
+
+## Shadow Mapping
+
+> If a light source is occluded, simply skip its diffuse and specular contribution
+
+### Shadow Maps
+
+
+1. Render scene as seen from light source
+- Store z-buffer (holds distance to light)
+- Light’s z-buffer is called shadow map
+
+2. Render scene from eye point
+- Light a certain image plane pixel (x,y)?
+- Map it back into word coordinates: (x',y',z')
+- Project it into shadow map: (x",y")
+- If distance point-to-light > depth stored in map
+    - Point is in shadow!
+
+OpenGL Implementation
+
+    Render scene with ambient lighting only
+        Update frame- and z-buffer
+    For each light source
+        Render scene from light source
+            Store z-buffer in shadow map
+        Render scene with light contribution (accumulate)
+            Shadow map look-up for each pixel
+            Pixels in shadow are discarded
+            Other pixels are lit and rendered
+
+
+
+
+
+
