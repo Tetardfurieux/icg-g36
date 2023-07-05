@@ -522,8 +522,113 @@ OpenGL Implementation
             Pixels in shadow are discarded
             Other pixels are lit and rendered
 
+# Week 7: Procedural Modeling
+
+Why?
+- abstraction
+- automatic generation
+- compact representations
+- infinite detail
+- parametric control
+- flexibility
 
 
+More Problems with Acquired Textures
+- Physical extent limited by storage size
+    - Particularly problematic for solid textures...
+- Repeating to fill more space causes visible artifacts:
+
+
+Problems with Pure Randomness
+- Neighboring samples are uncorrelated
+    - Natural phenomena lead to more structure
+- Get a different result every time
+    - When an artist finishes setting up a scene, they don’t want it to change.
+
+## Noise Functions
+
+Function $\mathbb{R}^n \rightarrow [-1,1]$
+
+Desirable properties
+- No obvious repetition
+- Rotation invariance
+- band-limited
+    - frequencies stay finite
+    - more structure than white noise
+- efficient to compute
+- reproducible
+
+`Piecewise cubic interpolation`
+    
+**Value Noise Issues**
+1. Cubic looks best (most organic), but it is expensive
+- Linear interpolation combines the $2^n$ nearest lattice values
+- Cubic interpolation combines the $4^n$ nearest lattice values…
+2. Repeatability
+- New random numbers every time you regenerate the values!
+3. Memory use
+- Cannot store an infinite number of random grid values
+
+Solution to 2 & 3:
+- Pre-compute a table of ~512 random values
+- Use a hash function to map lattice locations to table indices
+
+`Perlin (Gradient) Noise`  
+Generate random gradients on the grid  
+Interpolate these gradients with Hermite interpolation
+
+**Advantage**
+Get cubic interpolation with only $2^n$ nearest gradients, not $4^n$ values
+
+`Improved Perlin Noise`
+
+Randomly chose from only 12 pre-defined gradient vectors, (Human vision is sensitive to statistical orientation anomalies, but not the orientation granularity)
+Interpolate the corners’ linear functions with $6t^5-15t^4+10t^3$ instead of 
+$3t^2-2t^3$(avoid discontinuities in second derivative)
+
+Change amplitude: 10 * noise(x)
+Change frequency: noise(10 * x)
+
+### Spectral Synthesis
+
+Building a complex function $f_s(x)$ by summing weighted contributions from a scaled primitive function f(x)
+
+`Fractal Brownian Motion (fBm)` Spectral synthesis of noise function
+
+$f_s(x) = \sum_il^{-iH}f(l^ix)$
+
+> H = 1 -> relatively smooth fBm  
+> As H -> 0, the function becomes more like white noise 
+
+- Progressively higher frequency
+- Progressively smaller amplitude
+Each term in the summation is called an `octave`  
+Each octave typically **doubles frequency and halves amplitude**
+
+Statistically homogeneous and isotropic
+- homogeneous means "the same everywhere"
+- isotropic means "the same in all directions"
+
+`Turbulence` Another common compound noise function  
+Same as fBm, but sum the *absolute value* of the noise function
+
+## Fractals
+
+Colloquial definition:
+- Repetition of a given form over a range of scales
+- Self-similar
+
+Detail at multiple levels of magnification
+
+`Multifractals` Fractal system which has a different fractal dimension in different regions
+
+Heterogeneous fBM
+- Typical implementations don’t just spatially vary the H parameter
+- One strategy: scale higher frequencies in the summation by the value of the previous frequency.
+- Many possibilities: heterogenous terrain, hybrid multifractal, ridged multifractal
+    - See the Texturing & Modeling book [Ebert et al.] for details
+
+# Week 8: Advanced Methods
 
 
 
