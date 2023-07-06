@@ -630,5 +630,235 @@ Heterogeneous fBM
 
 # Week 8: Advanced Methods
 
+## Bump Mapping
+
+Derive normal perturbation from grayscale "height field"  
+Emulate slight raising and lowering of surface points
+
+> How to compute perturbed normal?
+
+p' = p + bn
+
+
+## Normal Maps vs Displacement Maps
+
+```js
+// normal, tangent, bitangent
+vec3 N=..., T=..., B=...;
+// access normal map
+vec3 dn = texture(normal_map, texcoord.st).xyz;
+// transform from [0,1] to [-1,1]
+dn = 2.0 * dn - vec3(1,1,1);
+// perturb normal in TBN coordinates
+N = normalize(dn.x*T + dn.y*B + dn.z*N);
+```
+
+Normal mapping
+- Don’t change geometry, only change normals based on texture
+- Can be performed in pixel shader
+- Silhouette still looks wrong
+
+Displacement mapping
+- Displace vertices based on offset stored in texture
+- Compute normal vectors of displaced surface
+- Performed in geometry shader or tesselation shader
+- Silhouette looks ok, but much more expensive to compute
+
+## Deferred Shading
+
+Screen-space lighting/shading technique
+1. Render colors, normals, and depth into textures
+2. Use screen-space filter to compute lighting for each image pixel
+Good: only compute lighting for visible pixels
+Bad: transparency and antialiasing are more difficult
+
+## Ambient Occlusion
+
+Measures the exposure to ambient lighting to darken more occluded,
+less acessible parts of the scene. Global method, can be efficiently
+implemented in screen space
+
+# Week 9:L-Systems
+
+L-System $G=(V, \omega, P)$
+- Grammar on an alphabet of symbols, V, such as "F", "+", "-".
+- Production rules P describe the replacement of a nonterminal symbol with a string of zero or more symbols.
+- Process is seeded with an axiom $\omega$, an initial string
+
+`Turtle` state defined with a position and an angle called the`heading`
+
+L-System string can be interpreted as turtle graphics commands
+
+$F$: move forward a step of length d
+$+$: turn left by angle \theta
+$-$: turn right by angle \theta
+$[$: push turtle state (save state)
+$]$: pop turtle state (restore last saved state)
+
+`Stochastic L-Systems` provide a probability for each production rule
+
+# Week 10: Freefrom Curves
+
+Which properties are important for a geometry representation?
+- Approximation power
+- Efficient evaluation of positions & derivatives
+- Ease of manipulation
+- Ease of implementation
+
+## Freeform Curves
+
+`Parametric curve representation` 
+$x(t) = (x(t), y(t), z(t))$
+
+Curve is defined as the image of the interval [a,b] under the continuous parameterization function x.
+
+First derivative defines the tangent vector:
+$t = x'(t) := \frac{dx(t)}{dt} = 
+\begin{pmatrix}
+dx(t) / dt \\
+dy(t) / dt \\
+dz(t) / dt
+\end{pmatrix}
+$
+
+### Discrete Curves
+
+Approximate the curve by a polygon, e.g. for rendering
+1. Sample parameter interval: $t_i = a + i \Delta t$
+2. Sample curve: $x_i = x(t_i)$
+3. Connect samples by polygon
+
+### Polynomial Curves
+
+Let's model curves as polynomials of degree n
+$x(t) = \sum^n_{i=0}b_i\phi_i(t) \in \Pi^n$
+
+**Monomial Basis**
+
+$x(t) = \sum^n_{i=0}b_it^i$
+
+V Approximation power  
+V Efficient evaluation of positions & derivatives  
+X Ease of manipulation   
+V Ease of implementation
+
+### Bernstein Polynomials
+
+![](7.png)
+![](8.png)
+
+Polynomials of degree n have n+1 coefficients
+
+## Bezier Curves
+
+`Bezier curves` use Bernstein polynomials as basis:
+
+$x(t) = \sum^n_{i=0}b_iB^n_i(t)$
+
+
+Properties of Bezier curves
+- `Affine combination` Point is an affine combination of control points. 
+Control points have geometric meaning!  
+- `Convex hull` Curve x(t) lies in convex hull of control points
+- `Endpoint interpolation` Curve x(t) starts at b_0 and ends at b_n
+- `Symmetry` Curve defined by $(b_n, b_{n-1}, ..., b_0)$ is the same as the one defined by $(b_0, b_1, ..., b_n)$, just in reverse order.
+- `Pseudo-local control` Control point $b_i$ has its maximum effect on the curve at $t=i/n$
+
+**Summary**
+- How to represent polynomial curves?
+- Monomial basis does not sum to one
+- Bernstein basis does sum to one
+- Bezier curves can intuitively be manipulated through control points
+- de Casteljau algorithm allows for efficient evaluation
+
+# Week 12: Freeform Surfaces
+
+## Bezier Curves vs B-Spline Curves
+
+Disadvantages of Bezier curves
+- Adding more DoFs raises degree
+- High-degree polynomials tend to oscillate
+- Only pseudo-local control
+
+Splines overcome these problems
+- Low-degree curve segments avoid oscillations
+- Connect segments with $C^{n-1}$ smoothness
+- Allows for local modifications
+- No more endpoint interpolation
+
+## Parametric Surfaces
+
+$X(u,v) = (x(u,v), y(u,v), z(u,v))^T$
+
+Tangents in u and v direction:
+$\frac{\delta}{\delta u}x(u,v), \frac{\delta}{\delta v}x(u,v)$
+
+Normal vector as the normalized cross-product of the two tangent vectors:
+$n(u,v) = \frac{\frac{\delta}{\delta u}x(u,v) \times \frac{\delta}{\delta v}x(u,v)}{||\frac{\delta}{\delta u}x(u,v) \times \frac{\delta}{\delta v}x(u,v)||}$
+
+Properties of Bezier Patches
+- u- and v-isolines are Bezier curves on the surface
+- x(u,v) is affine combination of control points
+- Surface lies in convex hull of control points
+- Surface interpolates corners of control grid
+- Surface interpolates boundary curves
+
+## B-Spline Surfaces
+
+Tensor product B-Spline surfaces
+$x(u,v) = \sum_{i=0}^L\sum_{j=0}^K d_{i,j}N^m_i(u)N^n_j(v)$
+
+Properties
+- Affine combination
+- Convex hull property
+- Local control
+- Maximal smoothness $C^{n-1}$
+
+## Freeform Deformation
+
+Tensor product spline deformations allow for local control
+$d(u,v,w) = \sum^l_{i=0}\sum^m_{j=0}\sum^n_{k=0} d_{i,j,k}N_i^l(u)N^m_j(v)N^n_k(w)$
+
+**Summary**
+
+Freeform Surfaces
+- Extend univariate curves to bivariate surfaces
+- Tensor product surfaces are “curves on curves”
+- 2D grid of control points
+- High quality smooth surfaces
+
+Freeform Deformation
+- Extend bivariate surfaces to trivariate volumes
+- Same tensor product idea
+- 3D grid of control points
+- Can deform arbitrary explicit representations
+
+# Week 12: Character Animation
+
+Rigging
+- Embed skeleton
+- Define bone weights
+
+Pose skeleton
+- Forward Kinematics
+- Inverse Kinematics
+- Motion Capture
+
+Skinning
+- Deform skin based on deformed skeleton
+
+## Rigging
+
+Weights must sum up to 1  
+Weights should be non-negative  
+Weights build `convex combinations` per vertex
+
+`Skeleton Forward Kinematics`
+
+Each joint j has a local coordinate system  
+Local matrix $L_j$ maps from j’s coordinate system to parent’s coordinates (rot+trans)  
+Global matrix $G_j$ maps from j’s coordinate system to root coordinates (rot+trans)  
+Compute global matrices through forward kinematics
+$G_j = L_1L_2...L_3 = G_{j-1}L_j$
 
 
