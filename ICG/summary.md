@@ -771,7 +771,7 @@ Control points have geometric meaning!
 - Bezier curves can intuitively be manipulated through control points
 - de Casteljau algorithm allows for efficient evaluation
 
-# Week 12: Freeform Surfaces
+# Week 11: Freeform Surfaces
 
 ## Bezier Curves vs B-Spline Curves
 
